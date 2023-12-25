@@ -63,6 +63,7 @@
 > ```
 
 </details>
+<details>
 
 <summary><code>POST </code> <code>/api/auth/logout</code> </summary>
 
@@ -94,6 +95,7 @@
 > ```
 
 </details>
+<details>
 
 <summary><code>POST </code> <code>/api/auth/logout/all</code> </summary>
 
