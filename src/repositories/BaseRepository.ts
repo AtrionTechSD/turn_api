@@ -1,6 +1,7 @@
 import { Model, ModelStatic } from "sequelize";
 import { Scope } from "../utils/scopes";
 import { IParams } from "../utils/Interfaces";
+import { Connection } from "../db/Connection";
 
 export class BaseRepository<T extends Model> {
   private model;
@@ -19,9 +20,7 @@ export class BaseRepository<T extends Model> {
     }
   }
 
-  public async getAll(
-    params: IParams
-  ): Promise<{ count: number; rows: Array<any> }> {
+  public async getAll(params: IParams): Promise<any> {
     return this.safeRun(() => Scope.get(this.model, params));
   }
 
@@ -41,8 +40,8 @@ export class BaseRepository<T extends Model> {
     );
   }
 
-  public async findById(dataId: number): Promise<T> {
-    return this.safeRun(() => this.find("id", dataId));
+  public async findById(dataId: number, params?: any): Promise<T> {
+    return this.safeRun(() => this.find("id", dataId, false, params));
   }
 
   public async first(): Promise<T> {
@@ -63,38 +62,44 @@ export class BaseRepository<T extends Model> {
     });
   }
 
-  public async create(data: any): Promise<T> {
-    return this.safeRun(() => this.model.create(data));
+  public async create(data: any, trans: any): Promise<T> {
+    return this.safeRun(() => this.model.create(data, { transaction: trans }));
   }
 
-  public async update(data: any, primaryKey: string | number): Promise<T> {
+  public async update(
+    data: any,
+    primaryKey: string | number,
+    trans: any
+  ): Promise<T> {
     return this.safeRun(async () => {
       const dataToUpdate = await this.find(this.primaryKeyName, primaryKey);
-      return dataToUpdate.update(data);
+      return dataToUpdate.update(data, { transaction: trans });
     });
   }
 
-  public async delete(primaryKey: string | number): Promise<T> {
+  public async delete(primaryKey: string | number, trans: any): Promise<T> {
     return this.safeRun(async () => {
       const dataToDelete = await this.find(this.primaryKeyName, primaryKey);
-      return dataToDelete.destroy();
+      return dataToDelete.destroy({ transaction: trans });
     });
   }
 
-  public async restore(primaryKey: string | number): Promise<T> {
+  public async restore(primaryKey: string | number, trans: any): Promise<T> {
     return this.safeRun(async () => {
       const dataToRestore = await this.find(
         this.primaryKeyName,
         primaryKey,
         true
       );
-      return dataToRestore.restore();
+      return dataToRestore.restore({ transaction: trans });
     });
   }
 
-  public async forceDelete(primaryKey: string | number): Promise<T> {
+  public async forceDelete(
+    primaryKey: string | number,
+    trans: any
+  ): Promise<T> {
     return this.safeRun(async () => {
-      const primaryKeyName: string = this.model.primaryKeyAttribute;
       const dataToForceDelete = await this.find(
         this.primaryKeyName,
         primaryKey,
@@ -102,6 +107,7 @@ export class BaseRepository<T extends Model> {
       );
       return dataToForceDelete.destroy({
         force: true,
+        transaction: trans,
       });
     });
   }

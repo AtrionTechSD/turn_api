@@ -3,4 +3,5 @@ export interface IModel {
   createdAt?: string;
   updatedAt?: string;
   getSearchables(): string[];
+  getRelations(): string[];
 }

@@ -4,6 +4,9 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 import IController from "./controllers/IController";
+import swaggerUI from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
+import config from "../app.config";
 
 export class App {
   public app: express.Application;
@@ -21,6 +24,11 @@ export class App {
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, "../public")));
     this.app.use(express.static(path.join(__dirname, "../views")));
+    this.app.use(
+      "/api/doc",
+      swaggerUI.serve,
+      swaggerUI.setup(swaggerJSDoc(config.swagger))
+    );
 
     this.app.use(
       cors({
@@ -36,8 +44,6 @@ export class App {
   }
 
   public listen() {
-    this.app.listen(this.port, () => {
-      console.log("Running on port " + this.port);
-    });
+    this.app.listen(this.port);
   }
 }

@@ -1,5 +1,6 @@
 import { Response } from "express";
 import config from "../../app.config";
+import jwt from "jsonwebtoken";
 
 class Tool {
   parseOrZero(value: string | number): number {
@@ -20,6 +21,12 @@ class Tool {
       httpOnly: true,
       sameSite: "strict",
       secure: config.app.env.includes("prod"),
+    });
+  }
+
+  getToken(payload: object, expiresIn: number): String {
+    return jwt.sign(payload, config.auth.secret, {
+      expiresIn,
     });
   }
 }

@@ -50,6 +50,22 @@ let config: any = {
     name: process.env.TEST_NAME,
     lastname: process.env.TEST_LASTNAME,
   },
+
+  swagger: {
+    definition: {
+      openapi: "3.1.0",
+      info: {
+        title: "Turn App Documentation",
+        version: "1.0.0",
+        servers: [
+          {
+            url: "http://localhost:3001",
+          },
+        ],
+      },
+    },
+    apis: [`${path.join(__dirname, "./src/docs/users.json")}`],
+  },
 };
 
 export default config;

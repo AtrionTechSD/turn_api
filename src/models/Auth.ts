@@ -7,6 +7,7 @@ import {
 import { Connection } from "../db/Connection";
 import { IModel } from "./IModel";
 import Role from "./Role";
+import User from "./User";
 
 class Auth
   extends Model<InferAttributes<Auth>, InferCreationAttributes<Auth>>
@@ -17,7 +18,7 @@ class Auth
   declare password: string;
   declare lastlogin: string;
   declare role_id: number;
-  declare session_id: number;
+  declare session_id: string;
   declare status: number;
   declare verified_at: string;
   declare createdAt: string;
@@ -26,6 +27,10 @@ class Auth
 
   getSearchables() {
     return ["email", "role_id", "last_login", "verified_at", "status"];
+  }
+  /* istanbul ignore next */
+  getRelations() {
+    return ["user", "role", "role.auths"];
   }
 }
 
@@ -46,6 +51,9 @@ Auth.init(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      get() {
+        return undefined;
+      },
     },
     lastlogin: {
       type: DataTypes.DATE,
@@ -76,6 +84,7 @@ Auth.init(
     },
     deletedAt: {
       type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {
@@ -94,5 +103,15 @@ Auth.belongsTo(Role, {
 Role.hasMany(Auth, {
   as: "auths",
   foreignKey: "role_id",
+});
+
+Auth.hasOne(User, {
+  foreignKey: "auth_id",
+  as: "user",
+});
+
+User.belongsTo(Auth, {
+  foreignKey: "auth_id",
+  as: "auth",
 });
 export default Auth;

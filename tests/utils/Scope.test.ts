@@ -53,7 +53,7 @@ describe("Test scope functions", () => {
       include?: Array<string>;
     }
 
-    const include = "product,role";
+    const include = "product,role.auths";
 
     const included: iInclude = Scope.include(include, Auth);
     expect(included.include?.length).toEqual(1);

@@ -64,9 +64,20 @@ export class Scope {
     model: T
   ): object {
     let included = {};
-    const associations = model.associations;
-    let inclusions = includes.split(",");
-    inclusions = inclusions.filter((i) => associations[i]);
+    const associations = new (model as any)().getRelations();
+    let inclusions: Array<any> = includes.split(",");
+    inclusions = inclusions.filter((i) =>
+      associations.find((ass: string) => ass == i)
+    );
+
+    inclusions.forEach((incl, key) => {
+      if (incl.includes(".")) {
+        inclusions[key] = {
+          association: incl.split(".")[0],
+          include: { association: incl.split(".")[1] },
+        };
+      }
+    });
     included = {
       include: inclusions,
     };

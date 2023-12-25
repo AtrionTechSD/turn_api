@@ -10,3 +10,13 @@ export interface IParams {
   fields?: string;
   withtrashed?: boolean;
 }
+
+export interface IUser {
+  name: string;
+  lastname: string;
+  phone: string;
+  address: string;
+  institute_id?: number;
+  auth_id?: number;
+  career_id?: number;
+}

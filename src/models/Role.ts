@@ -20,6 +20,10 @@ class Role
   getSearchables(): string[] {
     return ["name"];
   }
+  /* istanbul ignore next */
+  getRelations(): string[] {
+    return ["auths", "auths.user"];
+  }
 }
 
 const connection = Connection.getConnectionInstance();

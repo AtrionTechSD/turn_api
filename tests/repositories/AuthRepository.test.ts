@@ -1,3 +1,4 @@
+import { Connection } from "../../src/db/Connection";
 import Auth from "../../src/models/Auth";
 import { AuthRepository } from "../../src/repositories/AuthRepository";
 
@@ -24,20 +25,11 @@ describe("Test for auth repository", () => {
 
   test("It should get one auth", async () => {
     const authRepo = new AuthRepository();
-    let auth = await authRepo.getWithoutPassword({ limit: 5 });
+    let auth = await authRepo.getAll({ limit: 5 });
     expect(auth.count).toBeDefined();
     expect(auth.count).toBeGreaterThan(5);
-    auth = await authRepo.getWithoutPassword({ limit: 1 });
+    auth = await authRepo.getAll({ limit: 1 });
     expect(auth.id).toBeDefined();
-  });
-
-  test("It can get auths without password", async () => {
-    const authRepo = new AuthRepository();
-    const authWithoutPassword = await authRepo.getWithoutPassword({});
-    const isNull = authWithoutPassword.rows.every(
-      (row: any) => row.password === null
-    );
-    expect(isNull).toBe(true);
   });
 
   test("It should get first record", async () => {
@@ -55,58 +47,71 @@ describe("Test for auth repository", () => {
   });
 
   test("It should create new Auth", async () => {
+    const trans = await Connection.getConnectionInstance().getTrans();
     const authRepo = new AuthRepository();
     const newAuth = {
       email: "newAuth@test.com",
       password: "Xwz7S414lPsaI",
       role_id: 2,
     };
-    const result: Auth = await authRepo.create(newAuth);
+    const result: Auth = await authRepo.create(newAuth, trans);
     expect(result.id).toBeDefined();
     expect(result.id).toEqual(24);
     let error: any;
     try {
-      await authRepo.create({ ...newAuth, email: null });
+      await authRepo.create({ ...newAuth, email: null }, trans);
     } catch (err) {
       error = err;
     }
+    await trans.commit();
     expect(error).toBeDefined();
   });
 
   test("It should update auth", async () => {
+    const trans = await Connection.getConnectionInstance().getTrans();
     const authRepo = new AuthRepository();
     const updateData = {
       email: "updatedAuth@test.com",
     };
-    const updatedAuth = await authRepo.update(updateData, 24);
+    const updatedAuth = await authRepo.update(updateData, 24, trans);
+    await trans.commit();
     expect(updatedAuth.email).toEqual("updatedAuth@test.com");
   });
 
   test("It should softdelete auth", async () => {
+    const trans = await Connection.getConnectionInstance().getTrans();
     const authRepo = new AuthRepository();
-    const deleted = await authRepo.delete(24);
+    const deleted = await authRepo.delete(24, trans);
+    await trans.commit();
     expect(deleted.deletedAt).not.toBeNull();
   });
 
   test("It should be restored", async () => {
+    const trans = await Connection.getConnectionInstance().getTrans();
     const authRepo = new AuthRepository();
-    const restored = await authRepo.restore(24);
+    const restored = await authRepo.restore(24, trans);
+    await trans.commit();
     expect(restored.deletedAt).toBeNull();
   });
   test("It should forcedelete auth", async () => {
+    const trans = await Connection.getConnectionInstance().getTrans();
     const authRepo = new AuthRepository();
-    const deleted = await authRepo.forceDelete(24);
+    const deleted = await authRepo.forceDelete(24, trans);
+    await trans.commit();
     expect(deleted.id).toEqual(24);
   });
 
   test("It should assign role to auth", async () => {
     const authRepo = new AuthRepository();
+    const trans = await Connection.getConnectionInstance().getTrans();
+
     const auth = await authRepo.findById(1);
     try {
-      await authRepo.assingRole(1, auth);
+      await authRepo.assingRole(1, auth, trans);
       expect(1).toEqual(1);
     } catch (error) {
       expect(1).toEqual(2);
     }
+    trans.rollback();
   });
 });

@@ -15,6 +15,10 @@ describe("Testing Authmiddleware", () => {
   afterEach(() => {
     req.headers.authorization = undefined;
   });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   test("It should pass auth middleware", async () => {
     const auth = {
       id: 1,
@@ -59,14 +63,40 @@ describe("Testing Authmiddleware", () => {
     expect(res.json).toHaveBeenCalled();
   });
 
-  it("Should pass validateAuthRegister", () => {
+  test("It should pass middleware isRole", async () => {
+    const req = { auth: { role: { name: "admin" } } };
     const next = jest.fn();
+    let middleware = AuthMiddleware.isRole("admin");
+    middleware(req, res, next);
+    expect(next).toHaveBeenCalled();
+  });
 
-    const auth = {
-      email: "admin@atriontechsd.com",
-      password: "Admin1234",
-      role_id: "admin",
-    };
-    req.body = auth;
+  test("It should pass middleware isRole when any", async () => {
+    const req = { auth: { role: { name: "admin" } } };
+    const next = jest.fn();
+    let middleware = AuthMiddleware.isRole("any");
+    middleware(req, res, next);
+    expect(next).toHaveBeenCalled();
+  });
+
+  test("It should return error 419", async () => {
+    const req = { auth: { role: { name: "admin" } } };
+    const next = jest.fn();
+    const middleware = AuthMiddleware.isRole("client");
+    middleware(req, res, next);
+    expect(next).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalled();
+  });
+
+  test("It should return error 500", async () => {
+    const req = { auth: "wrong" };
+    const next = jest.fn();
+    const middleware = AuthMiddleware.isRole("client");
+    middleware(req, res, next);
+    expect(next).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({
+      statusCode: 500,
+      content: "Cannot read properties of undefined (reading 'name')",
+    });
   });
 });

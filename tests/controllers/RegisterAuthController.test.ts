@@ -1,20 +1,18 @@
-import { NextFunction, Request, Response, Router } from "express";
-import request from "supertest";
 import { AuthController } from "../../src/controllers/AuthController";
 import { AuthRepository } from "../../src/repositories/AuthRepository";
-import app from "../../App";
+import inteceptor from "../interceptor";
 import Auth from "../../src/models/Auth";
 import AuthMailService from "../../src/services/AuthMailService";
 import config from "../../app.config";
 import jwt from "jsonwebtoken";
-import interceptor from "../interceptor";
+import { Router } from "express";
 
-describe("Testing Auth Controller", () => {
+describe("Testing register functions", () => {
   jest.mock("../../src/repositories/AuthRepository");
-
   beforeAll(() => {
     jest.clearAllMocks();
   });
+
   test("AuthController must initialize", () => {
     const authController = new AuthController();
     expect(authController.prefix).toEqual("auth");
@@ -29,18 +27,19 @@ describe("Testing Auth Controller", () => {
       .spyOn(AuthMailService.prototype, "sendConfirmation")
       .mockResolvedValue({});
     const falseAuth = {
-      email: "21255454@example.com",
+      email: "other@atriontechsd.com",
       password: "password123",
-      role: "client",
     };
-    let response = await request(app.app)
+    let response = await inteceptor
+      .getServer()
       .post("/api/auth/register")
       .send(falseAuth);
     expect(response.status).toBe(201);
 
     mailMock.mockReset();
     mailMock.mockRejectedValue({});
-    response = await request(app.app)
+    response = await inteceptor
+      .getServer()
       .post("/api/auth/register")
       .send(falseAuth);
     expect(response.status).toBe(500);
@@ -50,38 +49,23 @@ describe("Testing Auth Controller", () => {
     const falseAuth = {
       email: "21255454@example.com",
       password: null,
-      role: "client",
     };
-    let response = await request(app.app)
+    let response = await inteceptor
+      .getServer()
       .post("/api/auth/register")
       .send(falseAuth);
-
     expect(response.status).toBe(422);
   });
 
   test("It should catch existing email", async () => {
     const falseAuth = {
-      email: "admin@example.com",
+      email: "admin@atriontechsd.com",
       password: "1232546584",
-      role: "client",
     };
-    let response = await request(app.app)
+    let response = await inteceptor
+      .getServer()
       .post("/api/auth/register")
       .send(falseAuth);
-
-    expect(response.status).toBe(422);
-  });
-
-  test("It should catch not existing role", async () => {
-    const falseAuth = {
-      email: "21255454@example.com",
-      password: "password123",
-      role: "cliente",
-    };
-    let response = await request(app.app)
-      .post("/api/auth/register")
-      .send(falseAuth);
-
     expect(response.status).toBe(422);
   });
 
@@ -92,12 +76,11 @@ describe("Testing Auth Controller", () => {
     const falseAuth = {
       email: "21255454@example.com",
       password: "password123",
-      role: "client",
     };
-    let response = await request(app.app)
+    let response = await inteceptor
+      .getServer()
       .post("/api/auth/register")
       .send(falseAuth);
-
     expect(response.status).toBe(500);
   });
 
@@ -109,7 +92,9 @@ describe("Testing Auth Controller", () => {
     jest
       .spyOn(AuthRepository.prototype, "update")
       .mockResolvedValue(new Auth());
-    const response = await request(app.app).get(`/api/auth/confirm/${token}`);
+    const response = await inteceptor
+      .getServer()
+      .get(`/api/auth/confirm/${token}`);
     expect(response.status).toEqual(200);
   });
 
@@ -121,9 +106,11 @@ describe("Testing Auth Controller", () => {
     jest
       .spyOn(AuthRepository.prototype, "update")
       .mockResolvedValue(new Auth());
-    let response = await request(app.app).get(`/api/auth/confirm/${token}`);
+    let response = await inteceptor
+      .getServer()
+      .get(`/api/auth/confirm/${token}`);
     expect(response.status).toEqual(422);
-    response = await request(app.app).get(`/api/auth/confirm/nada`);
+    response = await inteceptor.getServer().get(`/api/auth/confirm/nada`);
     expect(response.status).toEqual(422);
   });
 });

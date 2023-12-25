@@ -4,6 +4,8 @@ import config from "../../app.config";
 export class Connection {
   private static instance: Connection | null = null;
   private static connection: Sequelize;
+
+  private static trans: any;
   /* Para evitar que se puedan crear instancias con el "new" */
   private constructor() {
     if (Connection.connection == null) {
@@ -29,5 +31,9 @@ export class Connection {
 
   public getConnection(): Sequelize {
     return Connection.connection;
+  }
+
+  public async getTrans() {
+    return await Connection.connection.transaction();
   }
 }
