@@ -76,7 +76,7 @@ CREATE TABLE `documents` (
 
 CREATE TABLE `institutes` (
 `id` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-`name` VARCHAR(75) NOT NULL,
+`name` VARCHAR(75) NOT NULL UNIQUE,
 `sigla` VARCHAR(10) NOT NULL,
 `createdAt` TIMESTAMP NOT NULL DEFAULT current_timestamp,
 `updatedAt` TIMESTAMP NOT NULL DEFAULT current_timestamp,

@@ -1,7 +1,6 @@
 import { Router } from "express";
 import IController from "./IController";
 import response from "../utils/response";
-import AuthMiddleware from "../middlewares/AuthMiddleware";
 import UserService from "../services/UserService";
 import UserRoutes from "../routes/UserRoutes";
 

@@ -20,3 +20,7 @@ export interface IUser {
   auth_id?: number;
   career_id?: number;
 }
+export interface IInstitute {
+  name: string;
+  sigla: string;
+}

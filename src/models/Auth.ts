@@ -30,7 +30,7 @@ class Auth
   }
   /* istanbul ignore next */
   getRelations() {
-    return ["user", "role", "role.auths"];
+    return ["user", "role", "role.auths", "user.institute"];
   }
 }
 

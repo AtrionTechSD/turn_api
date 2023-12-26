@@ -1,19 +1,23 @@
 import { Model, ModelStatic, Op } from "sequelize";
 import { IParams } from "./Interfaces";
-import Parse from "./tools";
+import tools from "./tools";
 
-export class Scope {
-  static paginate(perPage: number, page: number): object {
+class Scope {
+  inclusiones: any = null;
+  paginate(perPage: number, page: number): object {
     const startIndex: number = (page - 1) * perPage;
-    const pagination: object = { offset: startIndex, limit: perPage };
+    const pagination: object = {
+      offset: tools.parseOrZero(startIndex),
+      limit: tools.parseOrZero(perPage),
+    };
     return pagination;
   }
 
-  static limit(limit: number): object {
-    return { limit: Parse.parseOrZero(limit) };
+  limit(limit: number): object {
+    return { limit: tools.parseOrZero(limit) };
   }
 
-  static search(search: string, cols: Array<string>): object {
+  search(search: string, cols: Array<string>): object {
     if (cols.length > 0) {
       return {
         [Op.or]: cols.map((col) => {
@@ -28,7 +32,7 @@ export class Scope {
     return {};
   }
 
-  static fields(fields: string, cols: Array<string>): Object {
+  fields(fields: string, cols: Array<string>): Object {
     let selections = fields.split(",");
     selections = selections.filter((sel) => cols.includes(sel) || sel == "id");
     if (selections.length > 0) {
@@ -38,7 +42,7 @@ export class Scope {
     }
   }
 
-  static filter(filter: Array<string>, cols: Array<string>): object {
+  filter(filter: Array<string>, cols: Array<string>): object {
     let filtered = {};
     const conditions: any = {};
     filter.forEach((f) => {
@@ -59,7 +63,7 @@ export class Scope {
     return filtered;
   }
 
-  static include<T extends typeof Model<any, any>>(
+  include<T extends typeof Model<any, any>>(
     includes: string,
     model: T
   ): object {
@@ -72,10 +76,7 @@ export class Scope {
 
     inclusions.forEach((incl, key) => {
       if (incl.includes(".")) {
-        inclusions[key] = {
-          association: incl.split(".")[0],
-          include: { association: incl.split(".")[1] },
-        };
+        inclusions[key] = this.recursiveInclude(incl.split("."), 0);
       }
     });
     included = {
@@ -84,7 +85,15 @@ export class Scope {
     return included;
   }
 
-  static order(cols: string[], field: string, desc?: Boolean): object {
+  recursiveInclude(incl: Array<any>, level: number): any {
+    if (level >= incl.length - 1) return { association: incl[level] };
+    return {
+      association: incl[level],
+      include: this.recursiveInclude(incl, level + 1),
+    };
+  }
+
+  order(cols: string[], field: string, desc?: Boolean): object {
     if (cols.includes(field)) {
       if (desc) {
         return { order: [[field, "DESC"]] };
@@ -94,13 +103,13 @@ export class Scope {
     return {};
   }
 
-  static withTrashed(paranoid: boolean): object {
+  withTrashed(paranoid: boolean): object {
     return {
       paranoid: !paranoid,
     };
   }
 
-  static getQuery<T extends typeof Model<any, any>>(
+  getQuery<T extends typeof Model<any, any>>(
     params: IParams,
     cols: Array<string>,
     model: T
@@ -124,12 +133,12 @@ export class Scope {
     return query;
   }
 
-  static async get<T extends Model>(
+  async get<T extends Model>(
     model: ModelStatic<T>,
     params: IParams
   ): Promise<any> {
     const cols = new (model as any)().getSearchables();
-    const args = Scope.getQuery(params, cols, model);
+    const args = this.getQuery(params, cols, model);
     let result = null;
     if (params.limit && params.limit == 1) {
       result = await model.findOne(args);
@@ -139,3 +148,5 @@ export class Scope {
     return result;
   }
 }
+
+export default new Scope();

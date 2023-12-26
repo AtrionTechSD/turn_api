@@ -144,4 +144,42 @@ describe("Testing user controller", () => {
 
     expect(response.status).toEqual(404);
   });
+
+  test("It should delete user", async () => {
+    const token = `Bearer ${interceptor.getAuthenticated()}`;
+    jest
+      .spyOn(UserRepository.prototype, "delete")
+      .mockResolvedValue(new User());
+    const response = await interceptor
+      .getServer()
+
+      .delete("/api/users/2")
+      .set("Authorization", token);
+
+    expect(response.status).toEqual(200);
+  });
+
+  test("It should catch error 500 on delete user", async () => {
+    const token = `Bearer ${interceptor.getAuthenticated()}`;
+    jest
+      .spyOn(UserRepository.prototype, "delete")
+      .mockRejectedValue(new User());
+    const response = await interceptor
+      .getServer()
+      .delete("/api/users/2")
+      .set("Authorization", token);
+    expect(response.status).toEqual(500);
+  });
+
+  test("It should catch not founded user to delete", async () => {
+    const token = `Bearer ${interceptor.getAuthenticated()}`;
+    jest
+      .spyOn(UserRepository.prototype, "delete")
+      .mockResolvedValue(new User());
+    const response = await interceptor
+      .getServer()
+      .delete("/api/users/25")
+      .set("Authorization", token);
+    expect(response.status).toEqual(404);
+  });
 });

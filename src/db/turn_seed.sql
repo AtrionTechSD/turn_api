@@ -35,3 +35,10 @@ INSERT INTO `users` (name, lastname, address, phone, auth_id) VALUES
 ('Contact', 'Eighty Six', 'Ruta 543, Apto 8A, San Antonio', '(809) 425-3325',3),
 ('Member', 'Notch', 'Avenida Carmelo, No. 721, San Juan', '(809) 870-2387',4),
 ('Miembro', 'Seventeen', 'Carretera Vieja, No. 190, Ciudad Central', '(829) 414-0258',5);
+
+INSERT INTO `institutes` (name, sigla) VALUES
+('Universidad Abierta Para Adultos', 'UAPA'),
+('Universidad Dominicana O&M', 'O&M'),
+('Universidad Nacional Evangélica', 'UNEV'),
+('Universidad Autónoma de Santo Domingo', 'UASD'),
+('Universidad Tecnológica de Santiago', 'UTESA');

@@ -2,7 +2,7 @@
 
 ---
 
-#### Schema Auth
+### Schema Auth
 
 <details>
  <summary>
@@ -23,7 +23,7 @@
 > | `422`     | application/json | `{"code":"422","message":"Unproccesable data"}`          |
 > | `500`     | application/json | `{"code":"500","message":"Unkonown server error"}`       |
 
-##### Example cURL
+##### Example Axios
 
 > ```javascript
 > axios({
@@ -52,7 +52,7 @@
 > | `422`     | application/json | `{"code":"422","message":"Unproccesable data"}`    |
 > | `500`     | application/json | `{"code":"500","message":"Unkonown server error"}` |
 
-##### Example cURL
+##### Example Axios
 
 > ```javascript
 > axios({
@@ -84,7 +84,7 @@
 > | `200`     | application/json | `{"code":"200","content": "Sesión cerrada exitosamente"}` |
 > | `500`     | application/json | `{"code":"500","message":"Unkonown server error"}`        |
 
-##### Example cURL
+##### Example Axios
 
 > ```javascript
 > axios({
@@ -116,13 +116,62 @@
 > | `200`     | application/json | `{"code":"200","content": "Se han cerrado todas las sesiones"}` |
 > | `500`     | application/json | `{"code":"500","message":"Unkonown server error"}`              |
 
-##### Example cURL
+##### Example Axios
 
 > ```javascript
 > axios({
 >   method: "post",
 >   headers: {Authorization: `Bearer ${token}`}
 >   url: "/api/auth/logout/all",
+> });
+> ```
+
+</details>
+
+---
+
+### Schema User
+
+<details>
+
+<summary><code>POST </code> <code>/api/users</code> </summary>
+
+##### Headers
+
+> | name          | type     | data type    | description           |
+> | ------------- | -------- | ------------ | --------------------- |
+> | Authorization | required | Bearer Token | Token provided by api |
+
+##### Parameters
+
+> | name     | type     | data type | description              |
+> | -------- | -------- | --------- | ------------------------ |
+> | name     | required | string    | First name for user      |
+> | lastname | required | string    | Last name for user       |
+> | phone    | required | string    | Phone number             |
+> | address  | required | string    | Complete address details |
+
+##### Responses
+
+> | http code | content-type     | response                                           |
+> | --------- | ---------------- | -------------------------------------------------- |
+> | `201`     | application/json | `{"code":"201","content": newUser (object)}`       |
+> | `422`     | application/json | `{"code":"422","content": "Unproccesable data"}`   |
+> | `500`     | application/json | `{"code":"500","message":"Unkonown server error"}` |
+
+##### Example Axios
+
+> ```javascript
+> axios({
+>   method: "post",
+>   headers: {Authorization: `Bearer ${token}`}
+>   url: "/api/auth/logout/all",
+>   data: {
+>        name: "John",
+>        lastname: "Doe",
+>        phone:"(809) 765-4321",
+>        address: "2310 Fifth Avenue, Bronx, New York"
+>        }
 > });
 > ```
 

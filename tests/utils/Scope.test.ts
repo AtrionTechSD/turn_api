@@ -1,5 +1,5 @@
 import Auth from "../../src/models/Auth";
-import { Scope } from "../../src/utils/scopes";
+import Scope from "../../src/utils/scopes";
 
 describe("Test scope functions", () => {
   test("It should return pagination object", () => {

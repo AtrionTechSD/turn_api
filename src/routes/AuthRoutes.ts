@@ -1,11 +1,13 @@
 import { Router } from "express";
-import AuthRequest from "../middlewares/AuthRequest";
 import AuthMiddleware from "../middlewares/AuthMiddleware";
+import AbstractRoutes from "./AbstractRoutes";
+import Requests from "../middlewares/Requests";
 
-export default class AuthRoutes {
-  private router: Router;
-  private controller: any;
+export default class AuthRoutes extends AbstractRoutes {
+  router: Router;
+  controller: any;
   constructor(router: Router, controller: any) {
+    super();
     this.router = router;
     this.controller = controller;
   }
@@ -13,8 +15,8 @@ export default class AuthRoutes {
   public initRoutes() {
     this.router.post(
       "/register",
-      AuthRequest.validateAuthRegister(),
-      AuthRequest.validate,
+      Requests.validateAuthRegister(),
+      Requests.validate,
       (req: any, res: any, next: any) =>
         this.controller.registerAuth(req, res, next)
     );
@@ -23,8 +25,8 @@ export default class AuthRoutes {
     );
     this.router.post(
       "/login",
-      AuthRequest.validateAuthLogin(),
-      AuthRequest.validate,
+      Requests.validateAuthLogin(),
+      Requests.validate,
       (req: any, res: any, next: any) =>
         this.controller.loginAuth(req, res, next)
     );

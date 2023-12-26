@@ -16,7 +16,7 @@ class AuthMiddleware extends Middleware {
       req.auth = auth.dataValues;
       next();
     } catch (error: any) {
-      response.error(res, 500, error.message);
+      response.error(res, error.code, error.message);
       return;
     }
   }

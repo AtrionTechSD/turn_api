@@ -1,7 +1,8 @@
 import { Model, ModelStatic } from "sequelize";
-import { Scope } from "../utils/scopes";
+import Scope from "../utils/scopes";
 import { IParams } from "../utils/Interfaces";
 import { Connection } from "../db/Connection";
+import tools from "../utils/tools";
 
 export class BaseRepository<T extends Model> {
   private model;
@@ -29,7 +30,7 @@ export class BaseRepository<T extends Model> {
     value: string | number | Boolean,
     withTrashed?: boolean,
     params?: any
-  ): Promise<T> {
+  ): Promise<any> {
     return this.safeRun(() =>
       Scope.get(this.model, {
         ...params,
@@ -40,8 +41,10 @@ export class BaseRepository<T extends Model> {
     );
   }
 
-  public async findById(dataId: number, params?: any): Promise<T> {
-    return this.safeRun(() => this.find("id", dataId, false, params));
+  public async findById(dataId: number, params?: any): Promise<any> {
+    return this.safeRun(() =>
+      this.find("id", tools.parseOrZero(dataId), false, params)
+    );
   }
 
   public async first(): Promise<T> {

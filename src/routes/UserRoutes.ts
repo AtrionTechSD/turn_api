@@ -1,11 +1,14 @@
 import { Router } from "express";
 import AuthMiddleware from "../middlewares/AuthMiddleware";
-import UserRequest from "../middlewares/UserRequest";
+import AbstractRoutes from "./AbstractRoutes";
+import Requests from "../middlewares/Requests";
 
-export default class UserRoutes {
-  private router: Router;
-  private controller: any;
+export default class UserRoutes extends AbstractRoutes {
+  router: Router;
+  controller: any;
+
   constructor(router: Router, controller: any) {
+    super();
     this.router = router;
     this.controller = controller;
   }
@@ -30,8 +33,8 @@ export default class UserRoutes {
       "/",
       AuthMiddleware.auth,
       AuthMiddleware.isRole("admin"),
-      UserRequest.validateUserCreate(),
-      UserRequest.validate,
+      Requests.validateUserCreate(),
+      Requests.validate,
       (req: any, res: any, next: any) => {
         this.controller.createUser(req, res, next);
       }
@@ -41,8 +44,8 @@ export default class UserRoutes {
       "/:id",
       AuthMiddleware.auth,
       AuthMiddleware.isRole("admin"),
-      UserRequest.validateUserCreate(),
-      UserRequest.validate,
+      Requests.validateUserCreate(),
+      Requests.validate,
       (req: any, res: any, next: any) => {
         this.controller.updateUser(req, res, next);
       }
