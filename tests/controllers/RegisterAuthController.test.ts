@@ -89,13 +89,14 @@ describe("Testing register functions", () => {
       email: "client1@example.com",
     };
     const token = jwt.sign(auth, config.auth.secret);
-    jest
-      .spyOn(AuthRepository.prototype, "update")
-      .mockResolvedValue(new Auth());
+
     const response = await inteceptor
       .getServer()
       .get(`/api/auth/confirm/${token}`);
+
+    const client = await new AuthRepository().find("email", auth.email);
     expect(response.status).toEqual(200);
+    expect(client.verified_at).not.toBeNull();
   });
 
   test("It should fail to confirm email", async () => {

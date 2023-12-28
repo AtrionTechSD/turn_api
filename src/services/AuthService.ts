@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Response } from "express";
 import tools from "../utils/tools";
 import { Connection } from "../db/Connection";
+import path from "path";
 
 interface IAuth {
   email: string;
@@ -21,6 +22,9 @@ export class AuthService {
   authRepo: AuthRepository = new AuthRepository();
   roleRepo: RoleRepository = new RoleRepository();
   authMailService: AuthMailService = new AuthMailService();
+
+  basePath: string = config.app.url;
+
   async createAuth(auth: IAuth) {
     const trans: any = await Connection.getConnectionInstance().getTrans();
     try {
@@ -61,11 +65,12 @@ export class AuthService {
 
   async sendConfirmation(auth: any) {
     try {
-      const basePath = config.app.url;
-      auth.confirmURL = `${basePath}/api/auth/confirm/testoken`;
-      auth.logo = basePath + "/logo.png";
-      auth.image = basePath + "/signup.svg";
-      auth.token = jwt.sign(auth, config.auth.secret, { expiresIn: 600 }); // Token de confirmación expira en 10 minutos
+      auth.confirmURL = `${this.basePath}/api/auth/confirm/${tools.getToken(
+        auth,
+        600
+      )}`;
+      auth.logo = this.basePath + "/api/public/logo.png";
+      auth.image = this.basePath + "/api/public/signup.svg";
       await this.authMailService.sendConfirmation(auth);
     } catch (error: any) {
       throw {
@@ -75,15 +80,15 @@ export class AuthService {
     }
   }
 
-  async confirmAuth(token: any): Promise<string> {
+  async confirmAuth(token: any): Promise<any> {
     return new Promise((res: any, rej: any) => {
       jwt.verify(token, config.auth.secret, async (err: any, decoded: any) => {
         const trans = await Connection.getConnectionInstance().getTrans();
         try {
           const auth: any = await this.authRepo.find("email", decoded.email);
-          this.authRepo.update(
+          await this.authRepo.update(
             {
-              verifedAt: new Date(),
+              verified_at: new Date(),
               session_id: uuidv4(),
             },
             auth.id,
@@ -105,7 +110,7 @@ export class AuthService {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
       let userAuth = await this.authRepo.find("email", auth.email, false, {
-        include: "role",
+        include: "role,user",
       });
 
       if (
@@ -115,7 +120,7 @@ export class AuthService {
         const updateData = { lastlogin: new Date(), status: 1 };
         await this.authRepo.update(updateData, userAuth.id, trans);
         const { token, refreshToken } = this.generateTokens(userAuth);
-        tools.setCookie(res, "refreshToken", refreshToken);
+        tools.setCookie(res, "refreshToken", `${refreshToken}`);
         tools.setCookie(res, "accessToken", `Bearer ${token}`);
         await trans.commit();
         return { userAuth, token };
@@ -134,13 +139,10 @@ export class AuthService {
   }
 
   private generateTokens(userAuth: any) {
-    const token = jwt.sign(userAuth.dataValues, config.auth.secret, {
-      expiresIn: config.auth.expiresIn,
-    });
-    const refreshToken = jwt.sign(
+    const token = tools.getToken(userAuth.dataValues, config.auth.expiresIn);
+    const refreshToken = tools.getToken(
       { email: userAuth.email },
-      config.auth.secret,
-      { expiresIn: "7d" }
+      7 * 24 * 60 * 60
     );
     return { token, refreshToken };
   }
@@ -176,6 +178,99 @@ export class AuthService {
       await trans.rollback();
       throw {
         code: 500,
+        message: error.message,
+      };
+    }
+  }
+
+  public async resetPassword(
+    authId: number,
+    newPassword: string
+  ): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const hashedPWD = await bcrypt.hash(newPassword, 10);
+      const updatedAuth = await this.authRepo.update(
+        {
+          password: hashedPWD,
+        },
+        authId,
+        trans
+      );
+      await trans.commit();
+      return updatedAuth;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: 500,
+        message: error.message,
+      };
+    }
+  }
+
+  public async sendRecoverLink(authEmail: string): Promise<any> {
+    try {
+      const token = tools.getToken(
+        {
+          email: authEmail,
+        },
+        600
+      );
+      const context = {
+        email: authEmail,
+        recoverURL: `${this.basePath}/api/auth/password/recover/${token}`,
+      };
+      await this.authMailService.sendRecoverLink(context);
+
+      return context;
+    } catch (error: any) {
+      throw {
+        code: 500,
+        message: error.message,
+      };
+    }
+  }
+
+  async renderRecoverForm(token: string) {
+    try {
+      const recover = path.join(config.app.views, "recoverPassword.html");
+      jwt.verify(token, config.auth.secret, (err: any, decoded: any) => {
+        if (err) {
+          throw {
+            code: 401,
+            message: "El token ya no es válido",
+          };
+        }
+      });
+      return recover;
+    } catch (error: any) {
+      throw {
+        code: error.code,
+        message: error.message,
+      };
+    }
+  }
+
+  async recoverPassword(newData: any): Promise<any> {
+    try {
+      const decoded: any = jwt.verify(
+        newData.token,
+        config.auth.secret,
+        (err: any, decoded: any) => {
+          if (err) {
+            throw {
+              code: 401,
+              message: "El token ya no es válido",
+            };
+          }
+          return decoded;
+        }
+      );
+      const auth = await this.authRepo.find("email", decoded.email);
+      await this.resetPassword(auth.id, newData.password);
+    } catch (error: any) {
+      throw {
+        code: error.code,
         message: error.message,
       };
     }

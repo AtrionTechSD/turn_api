@@ -45,4 +45,55 @@ export default class InstituteService {
       };
     }
   }
+
+  public async updateInstitute(
+    institute: IInstitute,
+    instiId: number
+  ): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const instiToUpdate = await this.instituteRepo.findById(instiId);
+      if (!instiToUpdate) {
+        throw {
+          code: 404,
+          message: "Institute not found",
+        };
+      }
+      const updatedInsti = await this.instituteRepo.update(
+        institute,
+        instiId,
+        trans
+      );
+      await trans.commit();
+      return updatedInsti;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: error.code || 500,
+        message: error.message,
+      };
+    }
+  }
+
+  public async deleteInstitute(instiId: number): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const instiToDelete = await this.instituteRepo.findById(instiId);
+      if (!instiToDelete) {
+        throw {
+          code: 404,
+          message: "Institute not found",
+        };
+      }
+      const deletedInsti = await this.instituteRepo.delete(instiId, trans);
+      await trans.commit();
+      return deletedInsti;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: error.code || 500,
+        message: error.message,
+      };
+    }
+  }
 }

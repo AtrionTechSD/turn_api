@@ -4,6 +4,8 @@ import express from "express";
 import AuthMiddleware from "../../src/middlewares/AuthMiddleware";
 import interceptor from "../interceptor";
 import { ContextRunner } from "express-validator";
+import tools from "../../src/utils/tools";
+import { AuthRepository } from "../../src/repositories/AuthRepository";
 
 const setToken = (payload: object): string => {
   return jwt.sign(payload, config.auth.secret);
@@ -97,6 +99,43 @@ describe("Testing Authmiddleware", () => {
     expect(res.json).toHaveBeenCalledWith({
       statusCode: 500,
       content: "Cannot read properties of undefined (reading 'name')",
+    });
+  });
+
+  test("It should validate on existing email", async () => {
+    const next = jest.fn();
+    const req = {
+      body: { email: "admin@atriontechsd.com" },
+    };
+
+    await AuthMiddleware.emailExists(req, res, next);
+    expect(next).toHaveBeenCalled();
+  });
+
+  test("It should validate not existing email", async () => {
+    const next = jest.fn();
+    const req = {
+      body: { email: "wrongemail@example.com" },
+    };
+
+    await AuthMiddleware.emailExists(req, res, next);
+    expect(res.json).toHaveBeenCalledWith({
+      statusCode: 404,
+      content: "Este correo no tiene ninguna cuenta asociada",
+    });
+  });
+
+  test("It should catch error 500 on emailsExist middlw", async () => {
+    const next = jest.fn();
+    const req = {
+      body: { email: "wrongemail@example.com" },
+    };
+    jest.spyOn(AuthRepository.prototype, "find").mockRejectedValue({});
+
+    await AuthMiddleware.emailExists(req, res, next);
+    expect(res.json).toHaveBeenCalledWith({
+      statusCode: 500,
+      content: undefined,
     });
   });
 });

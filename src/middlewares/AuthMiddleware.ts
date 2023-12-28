@@ -39,6 +39,29 @@ class AuthMiddleware extends Middleware {
     };
   }
 
+  async emailExists(req: any, res: Response, next: NextFunction) {
+    try {
+      const auth: any = await new AuthRepository().find(
+        "email",
+        req.body.email
+      );
+      if (auth) {
+        next();
+        return;
+      } else {
+        response.error(
+          res,
+          404,
+          "Este correo no tiene ninguna cuenta asociada"
+        );
+        return;
+      }
+    } catch (error: any) {
+      response.error(res, 500, error.message);
+      return;
+    }
+  }
+
   /* Check if token was provided */
   private async verifyTokenExists(req: Request, res: Response): Promise<any> {
     return new Promise((resolve, reject) => {

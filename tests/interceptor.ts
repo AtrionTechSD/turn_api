@@ -38,7 +38,7 @@ class Interceptor {
       };
     }
 
-    return tools.getToken(auth, 360000);
+    return tools.getToken(auth, 360);
   }
 }
 

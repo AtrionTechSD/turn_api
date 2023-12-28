@@ -1,6 +1,4 @@
-import Auth from "../models/Auth";
 import Mail from "./MailService";
-
 export default class AuthMailService {
   private mailService: Mail;
   constructor() {
@@ -14,6 +12,28 @@ export default class AuthMailService {
       template: "confirmation",
       context: user,
     };
-    return await this.mailService.send(email);
+    return await this.mailService
+      .to(email.to)
+      .subject(email.subject)
+      .context(email.context)
+      .template(email.template)
+      .attachment([])
+      .send();
+  }
+
+  public async sendRecoverLink(context: any) {
+    const email = {
+      to: context.email,
+      subject: `Recupere su contraseña: ${context.email}`,
+      template: "recover",
+      context: context,
+    };
+    return await this.mailService
+      .to(email.to)
+      .subject(email.subject)
+      .context(email.context)
+      .template(email.template)
+      .attachment([])
+      .send();
   }
 }

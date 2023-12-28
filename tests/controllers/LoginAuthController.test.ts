@@ -46,7 +46,7 @@ describe("Testing login functions", () => {
     const response = await interceptor
       .getServer()
       .post("/api/auth/login")
-      .send({ email: "client1@example.com", password: "client11234" });
+      .send({ email: "member79@test.org", password: "INvojDiLaT" });
     expect(response.status).toEqual(401);
     expect(response.body.content).toContain("Cuenta no verificada");
   });

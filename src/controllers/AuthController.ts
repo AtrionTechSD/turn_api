@@ -14,32 +14,16 @@ export class AuthController implements IController {
     new AuthRoutes(this.router, this).initRoutes();
   }
 
-  /**
-   * The `initRoutes` function sets up the routes for registering, confirming, logging in, logging out,
-
-
-  /**
-   * Handles the registration of a new user  authentication, and it returns a success response i.
-   * @param {Request} req -
-   * @param {Response} res -
-   * @param {NextFunction} next -
-   */
-  async registerAuth(req: Request, res: Response, next: NextFunction) {
+  async registerAuth(req: Request, res: Response) {
     try {
-      await this.authService.createAuth(req.body);
-      response.success(res, 201, "Cuenta creada exitosamente");
+      const newAuth = await this.authService.createAuth(req.body);
+      response.success(res, 201, newAuth, "Cuenta creada exitosamente");
     } catch (error: any) {
       response.error(res, error.code, error.message);
     }
   }
 
-  /**
-   *Handles the confirmation of user authentication by checking a token, and sends a response accordingly.
-   * @param {Request} req
-   * @param {Response} res -
-   * @param {NextFunction} next -
-   */
-  async confirmAuth(req: Request, res: Response, next: NextFunction) {
+  async confirmAuth(req: Request, res: Response) {
     try {
       await this.authService.confirmAuth(req.params.token);
       const confirmed = path.join(config.app.views, "confirmed.html");
@@ -53,43 +37,71 @@ export class AuthController implements IController {
     }
   }
 
-  /**
-   * Handles the authentication process foruser login.
-   * @param {Request} req -
-   * @param {Response} res -
-   * @param {NextFunction} next -
-   */
-  async loginAuth(req: Request, res: Response, next: NextFunction) {
+  async loginAuth(req: Request, res: Response) {
     try {
       const auth = await this.authService.login(req.body, res);
-      response.success(res, 200, auth);
+      response.success(res, 200, auth, "Sesión iniciada correctamente");
     } catch (error: any) {
       response.error(res, error.code, error.message);
     }
   }
 
-  /**
-   * The function logs out the user from the authentication system and sends a success response.
-   * @param {any} req -
-   * @param {Response} res -
-   * @param {NextFunction} next
-   */
-  async logoutAuth(req: any, res: Response, next: NextFunction) {
+  async logoutAuth(req: any, res: Response) {
     await this.authService.logout(res);
     response.success(res, 200, "Sesión cerrada exitosamente");
   }
 
-  /**
-   * The function logs out all authenticated sessions and returns a success message if successful, or
-   * an error message if there was an error.
-   * @param {any} req -
-   * @param {Response} res -
-   * @param {NextFunction} next -
-   */
-  async logoutAllAuth(req: any, res: Response, next: NextFunction) {
+  async logoutAllAuth(req: any, res: Response) {
     try {
       await this.authService.logoutAll(req, res);
       response.success(res, 200, "Se han cerrado todas las sesiones");
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
+
+  async resetPassword(req: any, res: Response) {
+    try {
+      const updatedAuth = await this.authService.resetPassword(
+        req.auth.id,
+        req.body.password
+      );
+      await this.authService.logoutAll(req, res);
+      response.success(res, 200, updatedAuth, "Contraseña actualizada");
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
+
+  async sendRecoverLink(req: any, res: Response) {
+    try {
+      const context = await this.authService.sendRecoverLink(req.body.email);
+      response.success(res, 200, context, "Correo de recuperación enviado");
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
+
+  async renderRecoverForm(req: any, res: Response) {
+    try {
+      const recover = await this.authService.renderRecoverForm(
+        req.params.token
+      );
+      res.sendFile(recover);
+    } catch (error: any) {
+      const errorConfirmation = path.join(
+        config.app.views,
+        "errorRecovering.html"
+      );
+      res.status(error.code).sendFile(errorConfirmation);
+    }
+  }
+
+  async recoverPassword(req: any, res: Response) {
+    try {
+      const newData = req.body;
+      await this.authService.recoverPassword(newData);
+      response.success(res, 200, "Ha recuperado su contraseña exitosamente");
     } catch (error: any) {
       response.error(res, error.code, error.message);
     }

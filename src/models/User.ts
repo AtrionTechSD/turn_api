@@ -24,11 +24,19 @@ class User
   declare deletedAt?: string;
 
   getSearchables(): string[] {
-    return ["name", "lastname", "address", "phone"];
+    return [
+      "name",
+      "lastname",
+      "address",
+      "phone",
+      "auth_id",
+      "institute_id",
+      "career_id",
+    ];
   }
   /* istanbul ignore next */
   getRelations() {
-    return ["auth", "auth.role"];
+    return ["auth", "auth.role", "institute", "institute.users"];
   }
 }
 

@@ -17,7 +17,8 @@ VALUES
 ('user41@example.com', 'TEqc0gOXCX', 2, '2023-12-26'),
 ('contact39@mail.com', '2wnIEIFGz9', 2, '2023-12-03'),
 ('contact95@example.com', 'x9ZjuW5Wb1', 2, '2023-12-09'),
-('member79@test.org', 'INvojDiLaT', 2, NULL),
+('member79@test.org', '$2a$12$Jks6nt4B3Rv8OWUS3QibUuJMTCqj1QLpkO7ts2Jvmf5vpnQcnVs2q
+', 2, NULL),
 ('user75@test.org', 'qLGRuTWLyQ', 2, '2023-12-20'),
 ('member95@test.org', 'r61c4nSYCI', 2, '2023-12-10'),
 ('contact21@example.com', 'GTo3CtcF7k', 2, NULL),

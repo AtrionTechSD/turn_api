@@ -14,7 +14,7 @@ export default class InstituteController implements IController {
     new InstituteRoutes(this.router, this).initRoutes();
   }
 
-  public async createInstitute(req: Request, res: any, next: NextFunction) {
+  public async createInstitute(req: Request, res: any) {
     try {
       const newInsti = await this.institueService.createInstitute(req.body);
       response.success(res, 201, newInsti);
@@ -23,7 +23,7 @@ export default class InstituteController implements IController {
     }
   }
 
-  public async getInstitutes(req: Request, res: any, next: NextFunction) {
+  public async getInstitutes(req: Request, res: any) {
     try {
       const institutes = await this.institueService.getInstitutes(req.query);
       response.success(res, 200, institutes);
@@ -31,13 +31,35 @@ export default class InstituteController implements IController {
       response.error(res, error.code, error.message);
     }
   }
-  public async findInstitute(req: any, res: any, next: NextFunction) {
+  public async findInstitute(req: any, res: any) {
     try {
       const instituteId = req.params.id;
       const institute = await this.institueService.findInstitute(
         instituteId,
         req.query
       );
+      response.success(res, 200, institute);
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
+
+  public async updateInstitute(req: any, res: any) {
+    try {
+      const instituteId = req.params.id;
+      const institute = await this.institueService.updateInstitute(
+        req.body,
+        instituteId
+      );
+      response.success(res, 200, institute);
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
+  public async deleteInstitute(req: any, res: any) {
+    try {
+      const instituteId = req.params.id;
+      const institute = await this.institueService.deleteInstitute(instituteId);
       response.success(res, 200, institute);
     } catch (error: any) {
       response.error(res, error.code, error.message);
