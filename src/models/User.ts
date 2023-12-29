@@ -14,6 +14,7 @@ class User
   declare id: number;
   declare name: string;
   declare lastname: string;
+  declare fullname: string;
   declare phone: string;
   declare address: string;
   declare auth_id?: number;
@@ -38,6 +39,10 @@ class User
   getRelations() {
     return ["auth", "auth.role", "institute", "institute.users"];
   }
+
+  fullName() {
+    return `${this.name} ${this.lastname}`;
+  }
 }
 
 const connection = Connection.getConnectionInstance();
@@ -57,6 +62,13 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    fullname: {
+      type: DataTypes.VIRTUAL,
+      get(this: User): string {
+        return `${this.name} ${this.lastname}`;
+      },
+    },
+
     phone: {
       type: DataTypes.STRING,
       allowNull: false,

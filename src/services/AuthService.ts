@@ -110,7 +110,7 @@ export class AuthService {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
       let userAuth = await this.authRepo.find("email", auth.email, false, {
-        include: "role,user",
+        include: "role,user.institute",
       });
 
       if (
@@ -138,7 +138,7 @@ export class AuthService {
     }
   }
 
-  private generateTokens(userAuth: any) {
+  public generateTokens(userAuth: any) {
     const token = tools.getToken(userAuth.dataValues, config.auth.expiresIn);
     const refreshToken = tools.getToken(
       { email: userAuth.email },
@@ -268,6 +268,37 @@ export class AuthService {
       );
       const auth = await this.authRepo.find("email", decoded.email);
       await this.resetPassword(auth.id, newData.password);
+    } catch (error: any) {
+      throw {
+        code: error.code,
+        message: error.message,
+      };
+    }
+  }
+
+  public async refreshToken(req: any, res: Response): Promise<any> {
+    try {
+      const freshToken = tools.getCookies(req)?.refreshToken || "none";
+      const decoded: any = jwt.verify(
+        freshToken,
+        config.auth.secret,
+        (err: any, decoded: any) => {
+          if (err) {
+            throw {
+              code: 401,
+              message: "Refresh token expirado o inválido",
+            };
+          }
+          return decoded;
+        }
+      );
+      let userAuth = await this.authRepo.find("email", decoded.email, false, {
+        include: "role,user",
+      });
+      const { token, refreshToken } = this.generateTokens(userAuth);
+      tools.setCookie(res, "refreshToken", `${refreshToken}`);
+      tools.setCookie(res, "accessToken", `Bearer ${token}`);
+      return { userAuth, token };
     } catch (error: any) {
       throw {
         code: error.code,

@@ -19,7 +19,7 @@ describe("Testing Authmiddleware", () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
   test("It should pass auth middleware", async () => {
     const auth = {
@@ -137,5 +137,33 @@ describe("Testing Authmiddleware", () => {
       statusCode: 500,
       content: undefined,
     });
+  });
+
+  it("It should refresh token", async () => {
+    const auth = {
+      id: 1,
+      email: "admin@atriontechsd.com",
+      session_id: null,
+    };
+    const token = tools.getToken(auth, -1);
+    const refreshToken = tools.getToken(auth, 72000);
+    const response = await interceptor
+      .getServer()
+      .post("/api/auth/refreshtoken")
+      .set("Cookie", `accessToken=${token}; refreshToken=${refreshToken}`);
+    expect(response.status).toEqual(200);
+  });
+
+  it("It should catch error 401 on refresh token", async () => {
+    const auth = {
+      id: 1,
+      email: "admin@atriontechsd.com",
+      session_id: null,
+    };
+
+    const response = await interceptor
+      .getServer()
+      .post("/api/auth/refreshtoken");
+    expect(response.status).toEqual(401);
   });
 });

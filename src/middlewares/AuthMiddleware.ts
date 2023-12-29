@@ -4,15 +4,14 @@ import jwt from "jsonwebtoken";
 import config from "../../app.config";
 import { AuthRepository } from "../repositories/AuthRepository";
 import Middleware from "./Middleware";
+import tools from "../utils/tools";
 
 class AuthMiddleware extends Middleware {
   async auth(req: any, res: Response, next: NextFunction): Promise<any> {
     try {
       const authToken = await this.verifyTokenExists(req, res);
-      const decoded = this.verifyTokenIsValid(authToken, res);
-
+      const decoded = this.verifyTokenIsValid(authToken, req);
       const auth = await this.validateSessionId(decoded, res);
-
       req.auth = auth.dataValues;
       next();
     } catch (error: any) {
@@ -63,10 +62,11 @@ class AuthMiddleware extends Middleware {
   }
 
   /* Check if token was provided */
-  private async verifyTokenExists(req: Request, res: Response): Promise<any> {
+  private async verifyTokenExists(req: any, res: Response): Promise<any> {
     return new Promise((resolve, reject) => {
       const authToken: any =
         req.headers.authorization || req.cookies.accessToken;
+      console.log(req.cookies);
       if (!authToken) {
         reject({
           code: 401,
@@ -78,7 +78,7 @@ class AuthMiddleware extends Middleware {
   }
 
   /* Check if token provided is valid */
-  private verifyTokenIsValid(authToken: string, res: Response) {
+  private verifyTokenIsValid(authToken: string, req: any) {
     return jwt.verify(
       authToken,
       config.auth.secret,
@@ -86,7 +86,7 @@ class AuthMiddleware extends Middleware {
         if (err) {
           throw {
             code: 401,
-            message: "El token suministrado no es válido",
+            message: err.message,
           };
         }
         return decoded;

@@ -46,6 +46,15 @@ export class AuthController implements IController {
     }
   }
 
+  async refreshToken(req: Request, res: Response) {
+    try {
+      const auth = await this.authService.refreshToken(req, res);
+      response.success(res, 200, auth, "Token actualizado con éxito");
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
+
   async logoutAuth(req: any, res: Response) {
     await this.authService.logout(res);
     response.success(res, 200, "Sesión cerrada exitosamente");

@@ -29,6 +29,11 @@ export default class AuthRoutes extends AbstractRoutes {
       Requests.validate,
       (req: any, res: any) => this.controller.loginAuth(req, res)
     );
+    this.router.post(
+      "/refreshtoken",
+
+      (req: any, res: any) => this.controller.refreshToken(req, res)
+    );
     this.router.post("/logout", AuthMiddleware.auth, (req: any, res: any) =>
       this.controller.logoutAuth(req, res)
     );

@@ -12,6 +12,7 @@ let config: any = {
     public: path.join(__dirname, "./public"),
     views: path.join(__dirname, "./views"),
     env: process.env.NODE_ENV,
+    allowedUrl: process.env.ALLOWED_URL,
   },
 
   db: {

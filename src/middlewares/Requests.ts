@@ -1,5 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidationChain, body, validationResult } from "express-validator";
+import {
+  ValidationChain,
+  body,
+  cookie,
+  validationResult,
+} from "express-validator";
 import response from "../utils/response";
 class Requests {
   public validate(req: Request, res: Response, next: NextFunction) {

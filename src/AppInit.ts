@@ -2,8 +2,9 @@ import express, { Express, Request, Response } from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import path from "path";
+
 import IController from "./controllers/IController";
+import config from "../app.config";
 
 export class App {
   public app: express.Application;
@@ -24,7 +25,8 @@ export class App {
 
     this.app.use(
       cors({
-        origin: "*",
+        origin: config.app.allowedUrl,
+        credentials: true,
       })
     );
   }
