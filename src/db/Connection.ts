@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import config from "../../app.config";
+import Relation from "../models/Relations";
 
 export class Connection {
   private static instance: Connection | null = null;

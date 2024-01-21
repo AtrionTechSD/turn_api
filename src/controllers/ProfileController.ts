@@ -34,4 +34,13 @@ export default class ProfileController implements IController {
       response.error(res, error.code, error.message);
     }
   }
+
+  public async setProfileImage(req: any, res: any) {
+    try {
+      const image = await this.profileService.setProfileImage(req, req.body);
+      response.success(res, 200, image, "Imagen de perfil actualizada");
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
+  }
 }

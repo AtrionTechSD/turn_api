@@ -1,6 +1,5 @@
 import { request, response } from "express";
 import InstituteMiddleware from "../../src/middlewares/InstituteMiddleware";
-import Institute from "../../src/models/Institute";
 import InstituteRepository from "../../src/repositories/InstituteRepository";
 import interceptor from "../interceptor";
 

@@ -1,9 +1,6 @@
 import Mail from "./MailService";
 export default class AuthMailService {
-  private mailService: Mail;
-  constructor() {
-    this.mailService = Mail.getMailInstance();
-  }
+  private mailService: Mail = Mail.getMailInstance();
 
   public async sendConfirmation(user: any) {
     const email = {

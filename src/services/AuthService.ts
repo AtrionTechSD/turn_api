@@ -19,9 +19,9 @@ interface IAuth {
 }
 
 export class AuthService {
-  authRepo: AuthRepository = new AuthRepository();
-  roleRepo: RoleRepository = new RoleRepository();
-  authMailService: AuthMailService = new AuthMailService();
+  private authRepo: AuthRepository = new AuthRepository();
+  private roleRepo: RoleRepository = new RoleRepository();
+  private authMailService: AuthMailService = new AuthMailService();
 
   basePath: string = config.app.url;
 
@@ -55,11 +55,7 @@ export class AuthService {
       return newAuth;
     } catch (error: any) {
       await trans.rollback();
-      if (error.code) {
-        throw error;
-      }
-
-      throw { code: 500, message: error.message };
+      throw { code: error.code, message: error.message };
     }
   }
 
@@ -110,7 +106,7 @@ export class AuthService {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
       let userAuth = await this.authRepo.find("email", auth.email, false, {
-        include: "role,user.institute",
+        include: "role,user.institute,user.image,user.career",
       });
 
       if (
@@ -131,10 +127,8 @@ export class AuthService {
       };
     } catch (error: any) {
       await trans.rollback();
-      if (error.code) {
-        throw error;
-      }
-      throw { code: 500, message: error.message };
+
+      throw { code: error.code, message: error.message };
     }
   }
 
@@ -293,7 +287,7 @@ export class AuthService {
         }
       );
       let userAuth = await this.authRepo.find("email", decoded.email, false, {
-        include: "role,user",
+        include: "role,user.institute,user.image",
       });
       const { token, refreshToken } = this.generateTokens(userAuth);
       tools.setCookie(res, "refreshToken", `${refreshToken}`);

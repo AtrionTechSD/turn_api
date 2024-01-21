@@ -1,7 +1,5 @@
 import request from "supertest";
 import app from "../App";
-import jwt from "jsonwebtoken";
-import config from "../app.config";
 import tools from "../src/utils/tools";
 
 class Interceptor {

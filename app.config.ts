@@ -6,7 +6,7 @@ dotenv.config();
 let config: any = {
   app: {
     port:
-      process.env.NODE_ENV == "dev" ? process.env.PORT : process.env.PORT_TEST,
+      process.env.NODE_ENV != "test" ? process.env.PORT : process.env.PORT_TEST,
     name: process.env.APP_NAME || "Turn",
     url: process.env.APP_URL || "http://localhost",
     public: path.join(__dirname, "./public"),
@@ -52,20 +52,10 @@ let config: any = {
     lastname: process.env.TEST_LASTNAME,
   },
 
-  swagger: {
-    definition: {
-      openapi: "3.1.0",
-      info: {
-        title: "Turn App Documentation",
-        version: "1.0.0",
-        servers: [
-          {
-            url: "http://localhost:3001",
-          },
-        ],
-      },
-    },
-    apis: [`${path.join(__dirname, "./src/docs/users.json")}`],
+  cloudinary: {
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
   },
 };
 

@@ -1,4 +1,5 @@
 import Auth from "../../src/models/Auth";
+import scopes from "../../src/utils/scopes";
 import Scope from "../../src/utils/scopes";
 
 describe("Test scope functions", () => {
@@ -76,6 +77,13 @@ describe("Test scope functions", () => {
     expect(result.paranoid).toEqual(false);
   });
 
+  test("It should return scopes filtereds", () => {
+    const fakeScopes = "active,deleted,old";
+    const modelScopes = ["deleted"];
+    const filtered = Scope.withScopes(fakeScopes, modelScopes);
+    expect(filtered).toEqual(["deleted"]);
+  });
+
   test("It should get query", async () => {
     const params = {
       page: 1,
@@ -87,6 +95,7 @@ describe("Test scope functions", () => {
       fields: "email,name",
       order: "email",
       desc: true,
+      scopes: "checkOrder",
     };
 
     const expectedKeys = [
@@ -98,12 +107,25 @@ describe("Test scope functions", () => {
       "where",
     ];
     const cols = ["id", "email", "role_id"];
-    let query: any = await Scope.getQuery(params, cols, Auth);
+    let query: any = Scope.getQuery(params, cols, Auth);
     expect(Object.keys(query).length).toBeGreaterThan(0);
     expect(Object.keys(query)).toEqual(expectedKeys);
     expect(query.offset).toEqual(0);
     expect(query.limit).toEqual(2);
     expect(query.include).toEqual(["role"]);
     expect(query.order[0]).toEqual(["email", "DESC"]);
+  });
+
+  test("It should return pagination object with props", () => {
+    const result = {
+      count: 100,
+      rows: [],
+    };
+
+    const pagination: any = scopes.getPaginationProps(5, 10, result);
+    expect(pagination.lastPage).toEqual(10);
+    expect(pagination.nextPage).toEqual(6);
+    expect(pagination.prevPage).toEqual(4);
+    expect(pagination.currentPage).toEqual(5);
   });
 });

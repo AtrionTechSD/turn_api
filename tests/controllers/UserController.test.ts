@@ -10,7 +10,7 @@ describe("Testing user controller", () => {
     const token = `Bearer ${interceptor.getAuthenticated()}`;
     const response = await interceptor
       .getServer()
-      .get("/api/users")
+      .get("/api/users?filter=test&scopes=onlyClient")
       .set("Authorization", token);
 
     expect(response.body.content.count).toBeGreaterThanOrEqual(5);
@@ -57,6 +57,7 @@ describe("Testing user controller", () => {
       lastname: "User",
       phone: "(809) 765-4321",
       address: "Fake street, no. 9, City",
+      email: "fakeuser@example.com",
     };
     jest
       .spyOn(UserRepository.prototype, "create")
@@ -76,6 +77,7 @@ describe("Testing user controller", () => {
       lastname: "User",
       phone: "(809) 765-4321",
       address: "Fake street, no. 9, City",
+      email: "fakeuser@example.com",
     };
     jest
       .spyOn(UserRepository.prototype, "create")
@@ -96,6 +98,7 @@ describe("Testing user controller", () => {
       lastname: "User",
       phone: "(809) 765-4321",
       address: "Fake street, no. 9, City",
+      email: "fakeuser@example.com",
     };
 
     jest
@@ -116,6 +119,7 @@ describe("Testing user controller", () => {
       lastname: "User",
       phone: "(809) 765-4321",
       address: "Fake street, no. 9, City",
+      email: "fakeuser@example.com",
     };
 
     jest.spyOn(UserRepository.prototype, "update").mockRejectedValue({});
@@ -134,6 +138,7 @@ describe("Testing user controller", () => {
       lastname: "User",
       phone: "(809) 765-4321",
       address: "Fake street, no. 9, City",
+      email: "fakeuser@example.com",
     };
 
     const response = await interceptor

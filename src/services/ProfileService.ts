@@ -1,12 +1,13 @@
 import { Connection } from "../db/Connection";
+import ImageRepository from "../repositories/ImageRepository";
 import UserRepository from "../repositories/UserRepository";
-import { IParams, IUser } from "../utils/Interfaces";
+import { IImage, IParams, IUser } from "../utils/Interfaces";
 import tools from "../utils/tools";
 import UserService from "./UserService";
 
 export default class ProfileService {
-  userRepo: UserRepository = new UserRepository();
-  userService: UserService = new UserService();
+  private userRepo: UserRepository = new UserRepository();
+  private imageRepo: ImageRepository = new ImageRepository();
 
   public async createProfile(profile: IUser, authId: number): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
@@ -34,6 +35,25 @@ export default class ProfileService {
       );
       return profile;
     } catch (error: any) {
+      throw {
+        code: 500,
+        message: error.message,
+      };
+    }
+  }
+
+  public async setProfileImage(req: any, image: IImage): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const imageAssigned = await this.imageRepo.asignToUser(
+        req.auth.user.id,
+        image,
+        trans
+      );
+      await trans.commit();
+      return imageAssigned;
+    } catch (error: any) {
+      await trans.rollback();
       throw {
         code: 500,
         message: error.message,

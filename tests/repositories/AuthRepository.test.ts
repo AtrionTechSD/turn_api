@@ -5,7 +5,7 @@ import { AuthRepository } from "../../src/repositories/AuthRepository";
 describe("Test for auth repository", () => {
   test("It should get auths", async () => {
     const authRepo = new AuthRepository();
-    const auth = await authRepo.getAll({});
+    const auth = await authRepo.getAll({ page: 1, perpage: 100 });
     expect(auth.count).toBeGreaterThan(0);
     expect(auth.rows.length).toBeGreaterThanOrEqual(1);
   });

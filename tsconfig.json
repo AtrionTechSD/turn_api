@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
-    /* Modules */
-    "module": "commonjs" /* Specify what module code is generated. */,
-    "target": "ES6",
-    "resolveJsonModule": true,
+    "module": "commonjs",
+    "target": "ES2022",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "outDir": "./dist"
-  }
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "rootDir": ".",
+    "removeComments": true
+  },
+  "include": ["src/**/*", "App.ts", "app.config.ts"],
+  "exclude": ["node_modules", "tests"]
 }

@@ -5,7 +5,7 @@ import { Connection } from "../db/Connection";
 import tools from "../utils/tools";
 
 export class BaseRepository<T extends Model> {
-  private model;
+  protected model;
   private primaryKeyName: string;
 
   constructor(model: ModelStatic<T>) {
@@ -34,6 +34,12 @@ export class BaseRepository<T extends Model> {
     return this.safeRun(() =>
       Scope.get(this.model, {
         ...params,
+        page: null,
+        perpage: null,
+        order: null,
+        desc: null,
+        search: null,
+        scopes: null,
         limit: 1,
         filter: [`${key}:${value}`],
         withtrashed: withTrashed,
@@ -41,9 +47,13 @@ export class BaseRepository<T extends Model> {
     );
   }
 
-  public async findById(dataId: number, params?: any): Promise<any> {
+  public async findById(
+    dataId: number,
+    params?: any,
+    withTrashed?: boolean
+  ): Promise<any> {
     return this.safeRun(() =>
-      this.find("id", tools.parseOrZero(dataId), false, params)
+      this.find("id", tools.parseOrZero(dataId), withTrashed, params)
     );
   }
 

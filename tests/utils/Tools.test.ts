@@ -1,3 +1,4 @@
+import tools from "../../src/utils/tools";
 import Tool from "../../src/utils/tools";
 import interceptor from "../interceptor";
 
@@ -12,5 +13,11 @@ describe("Test utils Tool", () => {
     const res = interceptor.mockResponse();
     Tool.setCookie(res, "test", "Tested");
     expect(res.cookie).toHaveBeenCalled();
+  });
+
+  test("It should parse string to firstUpper", () => {
+    const string = "foobar";
+    const converted = Tool.uppercaseFirst(string);
+    expect(converted).toEqual("Foobar");
   });
 });

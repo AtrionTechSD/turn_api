@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import config from "../../app.config";
 import jwt from "jsonwebtoken";
+import moment from "moment";
+import "moment/locale/es";
 
 class Tool {
   parseOrZero(value: string | number): number {
@@ -40,6 +42,19 @@ class Tool {
     return jwt.sign(payload, config.auth.secret, {
       expiresIn,
     });
+  }
+
+  dateToHuman(date: string): string {
+    return moment(date).locale("es").format("DD MMM YYYY, hh:mm:ss A");
+  }
+
+  diffDates(start: any, end: any): number {
+    start = moment(start);
+    end = moment(end);
+    return Math.round(moment.duration(end.diff(start)).asDays() * 100) / 100;
+  }
+  uppercaseFirst(str: string) {
+    return `${str[0].toUpperCase()}${str.substring(1)}`;
   }
 }
 

@@ -3,9 +3,16 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  Op,
+  Sequelize,
 } from "sequelize";
 import { IModel } from "./IModel";
 import { Connection } from "../db/Connection";
+import tools from "../utils/tools";
+import Image from "./Image";
+import Career from "./Career";
+import Order from "./Order";
+import Auth from "./Auth";
 
 class User
   extends Model<InferAttributes<User>, InferCreationAttributes<User>>
@@ -15,6 +22,7 @@ class User
   declare name: string;
   declare lastname: string;
   declare fullname: string;
+  declare email: string;
   declare phone: string;
   declare address: string;
   declare auth_id?: number;
@@ -28,6 +36,7 @@ class User
     return [
       "name",
       "lastname",
+      "email",
       "address",
       "phone",
       "auth_id",
@@ -37,11 +46,17 @@ class User
   }
   /* istanbul ignore next */
   getRelations() {
-    return ["auth", "auth.role", "institute", "institute.users"];
-  }
-
-  fullName() {
-    return `${this.name} ${this.lastname}`;
+    return [
+      "auth",
+      "auth.role",
+      "institute",
+      "institute.users",
+      "institute.image",
+      "image",
+      "career",
+      "orders",
+      "orders.tasks",
+    ];
   }
 }
 
@@ -68,7 +83,11 @@ User.init(
         return `${this.name} ${this.lastname}`;
       },
     },
-
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -92,6 +111,9 @@ User.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
+      get(this: User): string {
+        return tools.dateToHuman(this.dataValues.createdAt);
+      },
     },
     updatedAt: {
       type: DataTypes.DATE,
@@ -107,6 +129,20 @@ User.init(
     sequelize: connection.getConnection(),
     tableName: "users",
     paranoid: true,
+    scopes: {
+      /* istanbul ignore next */
+      onlyClient: () => ({
+        where: {
+          [Op.or]: [
+            { auth_id: null },
+            // Usamos una condición literal para referirnos a la tabla Auth relacionada
+            Sequelize.literal(
+              "EXISTS (SELECT 1 FROM `Auths` WHERE `Auths`.`id` = `User`.`auth_id` AND `Auths`.`role_id` = 2)"
+            ),
+          ],
+        },
+      }),
+    },
   }
 );
 

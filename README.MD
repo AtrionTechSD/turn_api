@@ -259,6 +259,7 @@ Para iniciar sesión, el usuario debe enviar su email y contraseña. Si las cred
 > | ------------ | -------- | --------- | ------------------------ |
 > | name         | required | string    | First name for user      |
 > | lastname     | required | string    | Last name for user       |
+> | email        | required | string    | Suggest same auth        |
 > | phone        | required | string    | Phone number             |
 > | address      | required | string    | Complete address details |
 > | institute_id | required | number    | Complete address details |

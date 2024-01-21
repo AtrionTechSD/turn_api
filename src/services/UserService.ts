@@ -3,10 +3,9 @@ import UserRepository from "../repositories/UserRepository";
 import { IParams, IUser } from "../utils/Interfaces";
 
 export default class UserService {
-  userRepo: UserRepository = new UserRepository();
+  private userRepo: UserRepository = new UserRepository();
   public async getUsers(params: IParams): Promise<any> {
     try {
-      params = { ...params, filter: undefined };
       const users = await this.userRepo.getAll(params);
       return users;
     } catch (error: any) {
@@ -28,7 +27,7 @@ export default class UserService {
     }
   }
   public async createUser(user: IUser): Promise<any> {
-    const { institute_id, auth_id, career_id, ...basicData } = user;
+    const { auth_id, ...basicData } = user;
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
       const newUser = await this.userRepo.create(basicData, trans);
@@ -46,7 +45,7 @@ export default class UserService {
   public async updateUser(user: IUser, userId: number): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
 
-    const { institute_id, auth_id, career_id, ...basicData } = user;
+    const { auth_id, ...basicData } = user;
     try {
       const existingUser = await this.userRepo.findById(userId);
       if (!existingUser) {
@@ -60,10 +59,7 @@ export default class UserService {
       return updatedUser;
     } catch (error: any) {
       await trans.rollback();
-      if (error.code) {
-        throw error;
-      }
-      throw { code: 500, message: error.message };
+      throw { code: error.code, message: error.message };
     }
   }
 
@@ -82,10 +78,26 @@ export default class UserService {
       return deletedUser;
     } catch (error: any) {
       await trans.rollback();
-      if (error.code) {
-        throw error;
+      throw { code: error.code, message: error.message };
+    }
+  }
+
+  public async restoreUser(userId: number): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const existingUser = await this.userRepo.findById(userId, {}, true);
+      if (!existingUser) {
+        throw {
+          code: 404,
+          message: "User not found",
+        };
       }
-      throw { code: 500, message: error.message };
+      const restoredUser = await this.userRepo.restore(userId, trans);
+      await trans.commit();
+      return restoredUser;
+    } catch (error: any) {
+      await trans.rollback();
+      throw { code: error.code, message: error.message };
     }
   }
 }

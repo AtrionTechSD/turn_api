@@ -10,7 +10,7 @@ export default {
   },
 
   error(res: Response, status: number, error: any): void {
-    res.status(status).json({
+    res.status(status || 500).json({
       statusCode: status,
       content: error,
     });

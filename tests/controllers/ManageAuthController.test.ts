@@ -101,8 +101,8 @@ describe("Testing manage auth account", () => {
     const token = tools.getToken({ email: "admin@atriontechsd.com" }, 60);
     const body = {
       token,
-      password: "password123",
-      password_confirmation: "password123",
+      password: "admin1234",
+      password_confirmation: "admin1234",
     };
 
     const response = await interceptor
@@ -128,7 +128,7 @@ describe("Testing manage auth account", () => {
     expect(response.status).toEqual(500);
   });
 
-  test("It should catchinvalidad token recover password", async () => {
+  test("It should catch invalid token recover password", async () => {
     const token = tools.getToken({ email: "admin@atriontechsd.com" }, 0);
     const body = {
       token,

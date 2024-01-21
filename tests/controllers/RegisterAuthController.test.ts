@@ -69,7 +69,7 @@ describe("Testing register functions", () => {
     expect(response.status).toBe(422);
   });
 
-  test("It should catch error 500 ", async () => {
+  test("It should catch error 500 on register user", async () => {
     const auth = new Auth();
     jest.spyOn(AuthRepository.prototype, "create").mockRejectedValue(auth);
     jest.spyOn(AuthRepository.prototype, "assingRole").mockResolvedValue({});

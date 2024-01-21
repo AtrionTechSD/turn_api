@@ -1,10 +1,11 @@
 import { Connection } from "../db/Connection";
+import ImageRepository from "../repositories/ImageRepository";
 import InstituteRepository from "../repositories/InstituteRepository";
-import { IInstitute, IParams } from "../utils/Interfaces";
+import { IImage, IInstitute, IParams } from "../utils/Interfaces";
 
 export default class InstituteService {
   private instituteRepo: InstituteRepository = new InstituteRepository();
-
+  private imageRepo: ImageRepository = new ImageRepository();
   public async createInstitute(institute: IInstitute): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
@@ -92,6 +93,25 @@ export default class InstituteService {
       await trans.rollback();
       throw {
         code: error.code || 500,
+        message: error.message,
+      };
+    }
+  }
+
+  public async setLogo(instituteId: number, image: IImage): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const imageAssigned = await this.imageRepo.asignToInstitute(
+        instituteId,
+        image,
+        trans
+      );
+      await trans.commit();
+      return imageAssigned;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: 500,
         message: error.message,
       };
     }

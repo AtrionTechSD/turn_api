@@ -1,5 +1,6 @@
+import ImageRepository from "../../src/repositories/ImageRepository";
 import InstituteRepository from "../../src/repositories/InstituteRepository";
-import { IInstitute } from "../../src/utils/Interfaces";
+import { IImage, IInstitute } from "../../src/utils/Interfaces";
 import interceptor from "../interceptor";
 
 describe("Testing institute controller", () => {
@@ -102,6 +103,55 @@ describe("Testing institute controller", () => {
       .set("Authorization", token)
       .send(fakeInsti);
     expect(response.status).toEqual(200);
+  });
+
+  test("It should set logo to institute", async () => {
+    const image: IImage = {
+      url: "https://placehold.co/400",
+      caption: "Image form institute",
+    };
+    const token = `Bearer ${interceptor.getAuthenticated()}`;
+    const response = await interceptor
+      .getServer()
+      .patch("/api/institutes/2/logo")
+      .set("Authorization", token)
+      .send(image);
+    expect(response.status).toEqual(201);
+    expect(response.body.content.url).toBeDefined();
+  });
+
+  test("It should update logo to institute", async () => {
+    const image: IImage = {
+      url: "https://placehold.co/600",
+      caption: "Image for institute",
+    };
+    const token = `Bearer ${interceptor.getAuthenticated()}`;
+    const response = await interceptor
+      .getServer()
+      .patch("/api/institutes/2/logo")
+      .set("Authorization", token)
+      .send(image);
+    expect(response.status).toEqual(201);
+    expect(response.body.content.createdAt).not.toEqual(
+      response.body.content.updatedAt
+    );
+  });
+
+  test("It should catch error 500 set logo to institute", async () => {
+    const image: IImage = {
+      url: "https://placehold.co/400",
+      caption: "Image for institute",
+    };
+    const token = `Bearer ${interceptor.getAuthenticated()}`;
+    jest
+      .spyOn(ImageRepository.prototype, "asignToInstitute")
+      .mockRejectedValue({});
+    const response = await interceptor
+      .getServer()
+      .patch("/api/institutes/2/logo")
+      .set("Authorization", token)
+      .send(image);
+    expect(response.status).toEqual(500);
   });
 
   test("It should catch not found on update institute", async () => {

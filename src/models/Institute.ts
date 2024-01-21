@@ -6,7 +6,6 @@ import {
 } from "sequelize";
 import { IModel } from "./IModel";
 import { Connection } from "../db/Connection";
-import User from "./User";
 
 class Institute
   extends Model<InferAttributes<Institute>, InferCreationAttributes<Institute>>
@@ -31,6 +30,7 @@ class Institute
       "users.auth.role",
       "users.career",
       "users.image",
+      "image",
     ];
   }
 }
@@ -67,19 +67,10 @@ Institute.init(
   },
   {
     modelName: "Institute",
-    tableName: "Institutes",
+    tableName: "institutes",
     paranoid: true,
     sequelize: connection.getConnection(),
   }
 );
 
-Institute.hasMany(User, {
-  as: "users",
-  foreignKey: "institute_id",
-});
-
-User.belongsTo(Institute, {
-  as: "institute",
-  foreignKey: "institute_id",
-});
 export default Institute;

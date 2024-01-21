@@ -4,18 +4,15 @@ import AbstractRoutes from "./AbstractRoutes";
 import Requests from "../middlewares/Requests";
 import { AuthController } from "../controllers/AuthController";
 
-export default class AuthRoutes extends AbstractRoutes {
-  router: Router;
-  controller: AuthController;
+export default class AuthRoutes extends AbstractRoutes<AuthController> {
   constructor(router: Router, controller: AuthController) {
-    super();
-    this.router = router;
-    this.controller = controller;
+    super(router, controller);
   }
 
   public initRoutes() {
     this.router.post(
       "/register",
+      AuthMiddleware.isUniqueEmail("auth"),
       Requests.validateAuthRegister(),
       Requests.validate,
       (req: any, res: any) => this.controller.registerAuth(req, res)

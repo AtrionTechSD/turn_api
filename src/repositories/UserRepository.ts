@@ -1,6 +1,6 @@
 import Auth from "../models/Auth";
 import User from "../models/User";
-import { IUser } from "../utils/Interfaces";
+import { IImage, IUser } from "../utils/Interfaces";
 import { BaseRepository } from "./BaseRepository";
 
 export default class UserRepository extends BaseRepository<User> {

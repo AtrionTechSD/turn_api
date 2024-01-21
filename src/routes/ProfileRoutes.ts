@@ -4,19 +4,13 @@ import ProfileController from "../controllers/ProfileController";
 import AuthMiddleware from "../middlewares/AuthMiddleware";
 import Requests from "../middlewares/Requests";
 
-export default class ProfileRoutes extends AbstractRoutes {
-  router: Router;
-  controller: ProfileController;
+export default class ProfileRoutes extends AbstractRoutes<ProfileController> {
   constructor(router: Router, controller: ProfileController) {
-    super();
-    this.router = router;
-    this.controller = controller;
+    super(router, controller);
   }
 
   initRoutes(): void {
     this.router.use(AuthMiddleware.auth);
-    /* The code block is defining the routes for the "/profile" endpoint. It's responsible
-    of handling creation, updating and retrievieng user profile */
     this.router
       .route("/")
       .post(
@@ -36,5 +30,14 @@ export default class ProfileRoutes extends AbstractRoutes {
       .get((req: any, res: any) => {
         this.controller.findProfile(req, res);
       });
+
+    this.router.post(
+      "/image",
+      Requests.validateImageCreation(),
+      Requests.validate,
+      (req: any, res: any) => {
+        this.controller.setProfileImage(req, res);
+      }
+    );
   }
 }

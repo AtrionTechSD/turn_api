@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import config from "../../app.config";
 import { AuthRepository } from "../repositories/AuthRepository";
 import Middleware from "./Middleware";
-import tools from "../utils/tools";
+import UserRepository from "../repositories/UserRepository";
 
 class AuthMiddleware extends Middleware {
   async auth(req: any, res: Response, next: NextFunction): Promise<any> {
@@ -66,7 +66,6 @@ class AuthMiddleware extends Middleware {
     return new Promise((resolve, reject) => {
       const authToken: any =
         req.headers.authorization || req.cookies.accessToken;
-      console.log(req.cookies);
       if (!authToken) {
         reject({
           code: 401,
@@ -94,12 +93,30 @@ class AuthMiddleware extends Middleware {
     );
   }
 
+  isUniqueEmail(schema: string) {
+    return async (req: any, res: any, next: NextFunction) => {
+      try {
+        const repo =
+          schema == "auth" ? new AuthRepository() : new UserRepository();
+        const exists = await repo.find("email", req.body.email);
+        if (exists) {
+          response.error(res, 422, "Este correo ya está registrado");
+          return;
+        }
+        next();
+      } catch (error: any) {
+        response.error(res, 500, error.message);
+        return;
+      }
+    };
+  }
+
   /* Check if token has not been invalidated */
   private async validateSessionId(decoded: any, res: Response) {
     try {
       const authRepository = new AuthRepository();
       const auth = await authRepository.find("id", decoded.id, false, {
-        include: "role",
+        include: "role,user.image",
       });
       if (auth.session_id !== decoded.session_id) {
         throw {

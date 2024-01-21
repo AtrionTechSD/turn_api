@@ -30,7 +30,14 @@ class Auth
   }
   /* istanbul ignore next */
   getRelations() {
-    return ["user", "role", "role.auths", "user.institute"];
+    return [
+      "user",
+      "role",
+      "role.auths",
+      "user.institute",
+      "user.image",
+      "user.career",
+    ];
   }
 }
 
@@ -95,23 +102,4 @@ Auth.init(
   }
 );
 
-Auth.belongsTo(Role, {
-  foreignKey: "role_id",
-  as: "role",
-});
-
-Role.hasMany(Auth, {
-  as: "auths",
-  foreignKey: "role_id",
-});
-
-Auth.hasOne(User, {
-  foreignKey: "auth_id",
-  as: "user",
-});
-
-User.belongsTo(Auth, {
-  foreignKey: "auth_id",
-  as: "auth",
-});
 export default Auth;
