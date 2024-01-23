@@ -5,9 +5,12 @@
   "main": "App.ts",
   "scripts": {
     "test": "npm run migrate && cross-env NODE_ENV=test  jest --testTimeout=35000 --coverage ",
-    "dev": "cross-env NODE_ENV=dev nodemon App.ts",
+    "dev": "cross-env NODE_ENV=dev nodemon -L App.ts",
     "migrate": "cross-env NODE_ENV=test ts-node ./tests/init.ts",
-    "build": "npx tsc && xcopy /E /I public dist\\public && xcopy /E /I views dist\\views && copy package.json dist"
+    "build": "npx tsc && xcopy /E /I public dist\\public && xcopy /E /I views dist\\views && copy package.json dist",
+    "docker:build": "docker build -t turn .",
+    "docker:run": "docker run -p 3001:3001 -v ./:/usr/node/app turn",
+    "docker:stop-all": "docker stop $(docker ps -q)"
   },
   "author": "Ismael Contreras",
   "license": "ISC",
@@ -27,6 +30,7 @@
     "dotenv": "^16.3.1",
     "email-templates": "^11.1.1",
     "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
     "express-validator": "^7.0.1",
     "iconv-lite": "^0.6.3",
     "jest": "^29.7.0",
