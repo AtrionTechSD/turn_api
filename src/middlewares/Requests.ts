@@ -138,19 +138,22 @@ class Requests {
       body("title", "El campo título es requerido").notEmpty(),
       body("description", "El campo descripción es requerido").notEmpty(),
       body("due_at", "La fecha de entrega es requerida").notEmpty(),
-      body("due_at", "La entrega debe ser posterior a la actual").custom(
-        (value) => {
-          return moment(value).isAfter(moment.now());
-        }
-      ),
+      body(
+        "due_at",
+        "La fecha de entrega debe ser posterior a la actual"
+      ).custom((value) => {
+        return moment(value).isAfter(moment.now());
+      }),
       body("status", "El campo estado es requerido").notEmpty(),
       body("status", "El estado no es válido").isIn(Object.values(OStatus)),
       body("type", "El campo tipo es requerido").notEmpty(),
       body("type", "El tipo de orden no es válido").isIn(Object.values(OType)),
       body("client_id", "El cliente es requerido").notEmpty(),
       body("client_id", "El id de cliente no es válido").isInt(),
-      body("tasks", "El formato de pedidos es inválido").isArray(),
-      body("tasks", "El pedido debe tener alguna tarea").notEmpty(),
+      body("tasks", "El formato de las tareas es inválido").isArray({
+        min: 1,
+        max: 10,
+      }),
     ];
   }
 

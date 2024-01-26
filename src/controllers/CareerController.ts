@@ -31,14 +31,14 @@ export default class CareerController
         req.params.id,
         req.body
       );
-      response.success(res, 201, updatedCareer, "Carrera registrada");
+      response.success(res, 201, updatedCareer, "Carrera actualizada");
     }, res);
   }
 
   public async getCareers(req: any, res: any) {
     this.safeRun(async () => {
       const updatedCareer = await this.careerService.getCareers(req.query);
-      response.success(res, 200, updatedCareer, "Carrera registrada");
+      response.success(res, 200, updatedCareer, "Listado de carreras");
     }, res);
   }
 
@@ -48,7 +48,7 @@ export default class CareerController
         req.params.id,
         req.query
       );
-      response.success(res, 200, updatedCareer, "Carrera registrada");
+      response.success(res, 200, updatedCareer, "Carrera encontrada");
     }, res);
   }
 
@@ -57,7 +57,7 @@ export default class CareerController
       const deletedCareer = await this.careerService.deteleCareer(
         req.params.id
       );
-      response.success(res, 200, deletedCareer, "Carrera registrada");
+      response.success(res, 200, deletedCareer, "Carrera eliminada");
     }, res);
   }
 }

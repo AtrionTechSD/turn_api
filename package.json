@@ -1,11 +1,11 @@
 {
   "name": "turn",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gestor de pedidos de Ismael",
   "main": "App.ts",
   "scripts": {
     "test": "npm run migrate && cross-env NODE_ENV=test  jest --testTimeout=35000 --coverage ",
-    "dev": "cross-env NODE_ENV=dev nodemon -L App.ts",
+    "dev": "cross-env NODE_ENV=dev nodemon App.ts",
     "migrate": "cross-env NODE_ENV=test ts-node ./tests/init.ts",
     "build": "npx tsc && xcopy /E /I public dist\\public && xcopy /E /I views dist\\views && copy package.json dist",
     "docker:build": "docker build -t turn .",

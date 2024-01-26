@@ -37,10 +37,7 @@ export class App {
     });
   }
 
-
-  
   public listen() {
-    console.log(`El puerto es: ${this.port} o  ninguno`)
     this.app.listen(this.port);
   }
 }

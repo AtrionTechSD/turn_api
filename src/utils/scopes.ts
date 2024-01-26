@@ -119,6 +119,7 @@ class Scope {
       }
     });
     included = {
+      distinct: "id",
       include: inclusions,
     };
     return included;

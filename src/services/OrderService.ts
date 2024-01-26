@@ -1,18 +1,27 @@
 import { Connection } from "../db/Connection";
 import ImageRepository from "../repositories/ImageRepository";
 import OrderRepository from "../repositories/OrderRepository";
+import TaskRepository from "../repositories/TaskRepository";
 import { IImage, IOrder, IParams } from "../utils/Interfaces";
 
 export default class OrderService {
   private orderRepo: OrderRepository = new OrderRepository();
+  private taskRepo: TaskRepository = new TaskRepository();
   private imageRepo: ImageRepository = new ImageRepository();
 
   async createOrder(order: IOrder): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
-      const newOrder = await this.orderRepo.create(order, trans);
-
+      order.tasks = order.tasks.map((t) => ({ ...t, id: null }));
+      let newOrder = await this.orderRepo.create(order, trans);
+      for (let i in order.tasks) {
+        const task = order.tasks[i];
+        await this.taskRepo.create({ ...task, order_id: newOrder.id }, trans);
+      }
       await trans.commit();
+      newOrder = await this.orderRepo.findById(newOrder.id, {
+        include: "tasks,client",
+      });
       return newOrder;
     } catch (error: any) {
       await trans.rollback();

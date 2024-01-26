@@ -23,7 +23,7 @@ let config: any = {
     password: process.env.DATABASE_PASSWORD || "",
     host: process.env.DATABASE_HOST || "localhost",
     dialect: process.env.DATABASE_DIALECT || "mysql",
-    logging: process.env.BD_LOGGIN === "TRUE",
+    logging: process.env.DATABASE_LOGGING == "TRUE",
   },
 
   mail: {
