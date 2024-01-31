@@ -1,4 +1,4 @@
-import { Model, ModelStatic } from "sequelize";
+import { Model, ModelStatic, Sequelize } from "sequelize";
 import Scope from "../utils/scopes";
 import { IParams } from "../utils/Interfaces";
 import { Connection } from "../db/Connection";
@@ -82,11 +82,20 @@ export class BaseRepository<T extends Model> {
   public async update(
     data: any,
     primaryKey: string | number,
-    trans: any
+    trans: any,
+    key?: string
   ): Promise<T> {
     return this.safeRun(async () => {
-      const dataToUpdate = await this.find(this.primaryKeyName, primaryKey);
-      return dataToUpdate.update(data, { transaction: trans });
+      return this.model.update(
+        { ...data, deletedAt: null },
+        {
+          where: Sequelize.where(
+            Sequelize.col(key || this.primaryKeyName),
+            primaryKey
+          ),
+          transaction: trans,
+        }
+      );
     });
   }
 

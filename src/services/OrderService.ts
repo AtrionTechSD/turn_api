@@ -2,7 +2,7 @@ import { Connection } from "../db/Connection";
 import ImageRepository from "../repositories/ImageRepository";
 import OrderRepository from "../repositories/OrderRepository";
 import TaskRepository from "../repositories/TaskRepository";
-import { IImage, IOrder, IParams } from "../utils/Interfaces";
+import { IImage, IOrder, IParams, OStatus } from "../utils/Interfaces";
 
 export default class OrderService {
   private orderRepo: OrderRepository = new OrderRepository();
@@ -46,14 +46,22 @@ export default class OrderService {
     }
   }
 
-  async changeStatus(orderId: number, status: string): Promise<any> {
+  async changeStatus(orderId: number, newStatus: any): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
       const editedOrder = await this.orderRepo.update(
-        { status },
+        newStatus,
         orderId,
         trans
       );
+      if (newStatus.status == OStatus.completed) {
+        await this.taskRepo.update(
+          { status: 1, done_at: new Date() },
+          orderId,
+          trans,
+          "order_id"
+        );
+      }
       await trans.commit();
       return editedOrder;
     } catch (error: any) {

@@ -129,20 +129,7 @@ User.init(
     sequelize: connection.getConnection(),
     tableName: "users",
     paranoid: true,
-    scopes: {
-      /* istanbul ignore next */
-      onlyClient: () => ({
-        where: {
-          [Op.or]: [
-            { auth_id: null },
-            // Usamos una condición literal para referirnos a la tabla Auth relacionada
-            Sequelize.literal(
-              "EXISTS (SELECT 1 FROM `Auths` WHERE `Auths`.`id` = `User`.`auth_id` AND `Auths`.`role_id` = 2)"
-            ),
-          ],
-        },
-      }),
-    },
+    
   }
 );
 

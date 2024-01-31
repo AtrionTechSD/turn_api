@@ -1,7 +1,8 @@
 import { Connection } from "../db/Connection";
 import ImageRepository from "../repositories/ImageRepository";
+import OrderRepository from "../repositories/OrderRepository";
 import TaskRepository from "../repositories/TaskRepository";
-import { IImage, IParams, ITask } from "../utils/Interfaces";
+import { IImage, IParams, ITask, OStatus } from "../utils/Interfaces";
 import tools from "../utils/tools";
 
 export default class TaskService {
@@ -52,16 +53,52 @@ export default class TaskService {
     }
   }
 
-  async changeStatus(taskId: number, status: number): Promise<any> {
+  async bulkComplete(taskIds: Array<number>): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
     try {
-      const updatedTask = await this.taskRepo.update(
-        { status: tools.parseOrZero(status) },
-        taskId,
+      const updateds = [];
+      for (let i = 0; i < taskIds.length; i++) {
+        const updatedTask = await this.taskRepo.update(
+          { status: 1, done_at: new Date() },
+          taskIds[i],
+          trans
+        );
+        updateds.push(updatedTask);
+      }
+      await trans.commit();
+      return updateds;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: error.code,
+        message: error.message,
+      };
+    }
+  }
+  async bulkPendiente(taskIds: Array<number>): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const updateds = [];
+      for (let i = 0; i < taskIds.length; i++) {
+        const updatedTask = await this.taskRepo.update(
+          { status: 0 },
+          taskIds[i],
+          trans
+        );
+        updateds.push(updatedTask);
+      }
+
+      const task = await this.taskRepo.findById(taskIds[0]);
+      await new OrderRepository().update(
+        {
+          status: OStatus.process,
+          done_at: null,
+        },
+        task.order_id,
         trans
       );
       await trans.commit();
-      return updatedTask;
+      return updateds;
     } catch (error: any) {
       await trans.rollback();
       throw {

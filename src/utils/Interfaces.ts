@@ -40,7 +40,7 @@ export interface IImage {
 export enum CGrade {
   pregrade = "Pregrado",
   grade = "Grado",
-  master = "Mastería",
+  master = "Maestría",
   doctor = "Doctorado",
   diplome = "Diplomado",
   other = "Otro",
@@ -84,4 +84,5 @@ export interface ITask {
   title: string;
   due_at: string;
   order_id?: number;
+  status?: 0 | 1;
 }

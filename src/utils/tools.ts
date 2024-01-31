@@ -21,7 +21,7 @@ class Tool {
   setCookie(res: Response, name: string, value: string) {
     res.cookie(name, value, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: false,
       secure: true,
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
@@ -51,7 +51,7 @@ class Tool {
   diffDates(start: any, end: any): number {
     start = moment(start);
     end = moment(end);
-    return Math.round(moment.duration(end.diff(start)).asDays() * 100) / 100;
+    return Math.round(moment.duration(end.diff(start)).asHours() * 100) / 100;
   }
   uppercaseFirst(str: string) {
     return `${str[0].toUpperCase()}${str.substring(1)}`;

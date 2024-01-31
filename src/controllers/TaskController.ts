@@ -33,12 +33,16 @@ export default class TaskController extends Controller implements IController {
       response.success(res, 201, updatedTask, "Tarea actualizada");
     }, res);
   }
-  async changeStatus(req: any, res: any) {
+  async bulkComplete(req: any, res: any) {
     this.safeRun(async () => {
-      const updatedTask = await this.taskService.changeStatus(
-        req.params.id,
-        req.body.status
-      );
+      const updatedTask = await this.taskService.bulkComplete(req.body.ids);
+      response.success(res, 201, updatedTask, "Estado de tarea cambiado");
+    }, res);
+  }
+
+  async bulkPendiente(req: any, res: any) {
+    this.safeRun(async () => {
+      const updatedTask = await this.taskService.bulkPendiente(req.body.ids);
       response.success(res, 201, updatedTask, "Estado de tarea cambiado");
     }, res);
   }

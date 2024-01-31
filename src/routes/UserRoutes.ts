@@ -19,6 +19,14 @@ export default class UserRoutes extends AbstractRoutes<UserController> {
       this.controller.findUser(req, res);
     });
 
+    this.router.patch(
+      "/:id/image",
+      Requests.validateImageCreation(),
+      Requests.validate,
+      (req: any, res: any) => {
+        this.controller.setProfileImage(req, res);
+      }
+    );
     this.router.post(
       "/",
       AuthMiddleware.isUniqueEmail("user"),

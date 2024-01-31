@@ -1,9 +1,11 @@
 import { Connection } from "../db/Connection";
+import ImageRepository from "../repositories/ImageRepository";
 import UserRepository from "../repositories/UserRepository";
-import { IParams, IUser } from "../utils/Interfaces";
+import { IImage, IParams, IUser } from "../utils/Interfaces";
 
 export default class UserService {
   private userRepo: UserRepository = new UserRepository();
+  private imageRepo: ImageRepository = new ImageRepository();
   public async getUsers(params: IParams): Promise<any> {
     try {
       const users = await this.userRepo.getAll(params);
@@ -98,6 +100,25 @@ export default class UserService {
     } catch (error: any) {
       await trans.rollback();
       throw { code: error.code, message: error.message };
+    }
+  }
+
+  public async setProfileImage(userId: number, image: IImage): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const imageAssigned = await this.imageRepo.asignToUser(
+        userId,
+        image,
+        trans
+      );
+      await trans.commit();
+      return imageAssigned;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: 500,
+        message: error.message,
+      };
     }
   }
 }

@@ -8,6 +8,8 @@ import { IModel } from "./IModel";
 import { Connection } from "../db/Connection";
 import Task from "./Task";
 import tools from "../utils/tools";
+import moment from "moment";
+import { ITask } from "../utils/Interfaces";
 
 class Order
   extends Model<InferAttributes<Order>, InferCreationAttributes<Order>>
@@ -20,9 +22,11 @@ class Order
   declare title: string;
   declare description: string;
   declare due_at: string;
+  declare formated_due_at: string;
   declare left: number;
-  declare leftPercent: number;
+  declare leftPercent: object;
   declare done_at: string;
+  declare formated_done_at: string;
   declare price: number;
   declare status: string;
   declare type: string;
@@ -76,17 +80,25 @@ Order.init(
 
     due_at: {
       type: DataTypes.DATE,
+      allowNull: false,
+    },
+    formated_due_at: {
+      type: DataTypes.VIRTUAL,
       allowNull: true,
       get(this: Order): string {
-        return tools.dateToHuman(this.dataValues.due_at);
+        return moment(this.dataValues.due_at).format("DD/MM/YYYY");
       },
     },
     done_at: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    formated_done_at: {
+      type: DataTypes.VIRTUAL,
+      allowNull: true,
       get(this: Order): string | null {
         if (!this.dataValues.done_at) return null;
-        return tools.dateToHuman(this.dataValues.done_at);
+        return moment(this.dataValues.done_at).format("DD/MM/YYYY");
       },
     },
     left: {
@@ -104,18 +116,15 @@ Order.init(
     leftPercent: {
       type: DataTypes.VIRTUAL,
       allowNull: true,
-      get(this: Order): number {
-        const leftPerc =
-          Math.round(
-            (this.left /
-              tools.diffDates(this.createdAt, this.dataValues.due_at)) *
-              10000
-          ) / 100;
-        return leftPerc < 0 && this.status == "Completado"
-          ? 100
-          : leftPerc < 0
-          ? 0
-          : leftPerc;
+      get(this: Order): Object {
+        const tasks = (this.dataValues as any).tasks || [];
+        const pendientes = tasks.filter((t: ITask) => t.status == 0).length;
+        const completes = tasks.filter((t: ITask) => t.status == 1).length;
+        return {
+          pendientes,
+          completes,
+          percent: Math.round((completes / tasks.length) * 10000) / 100,
+        };
       },
     },
     status: {

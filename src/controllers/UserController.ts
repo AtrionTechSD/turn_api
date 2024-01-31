@@ -61,9 +61,18 @@ export default class UserController extends Controller implements IController {
   public async restoreUser(req: any, res: any) {
     this.safeRun(async () => {
       const userId = req.params.id;
-      console.log("restore");
       const restoredUser = await this.userService.restoreUser(userId);
       response.success(res, 200, restoredUser);
     }, res);
+  }
+
+  public async setProfileImage(req: any, res: any) {
+    try {
+      const userId = req.params.id;
+      const image = await this.userService.setProfileImage(userId, req.body);
+      response.success(res, 200, image, "Imagen de perfil actualizada");
+    } catch (error: any) {
+      response.error(res, error.code, error.message);
+    }
   }
 }

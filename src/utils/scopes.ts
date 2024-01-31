@@ -80,7 +80,7 @@ class Scope {
         Object.keys(this.operators).includes(parts[1])
       ) {
         const filt = {
-          [parts[0]]: { [this.operators[parts[1]]]: parts[2] },
+          [parts[0]]: { [this.operators[parts[1]]]: parts[2].split(",") }, //field:op:value1,value2
         };
         if (parts[3] == "or") {
           or.push(filt);
@@ -188,6 +188,9 @@ class Scope {
     if (!params.page && (!params.limit || params.limit > 1000)) {
       params.limit === 1000;
     }
+    cols.push("createdAt");
+    cols.push("updatedAt");
+    cols.push("id");
     const query: any = {
       ...(params.page && params.perpage
         ? this.paginate(params.perpage, params.page)

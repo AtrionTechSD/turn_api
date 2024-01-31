@@ -7,6 +7,8 @@ import {
 import { IModel } from "./IModel";
 import { Connection } from "../db/Connection";
 import Order from "./Order";
+import moment from "moment";
+import tools from "../utils/tools";
 
 class Task
   extends Model<InferAttributes<Task>, InferCreationAttributes<Task>>
@@ -19,7 +21,11 @@ class Task
   declare title: string;
   declare status: number;
   declare due_at: string;
+  declare formated_due_at: string;
+  declare left: number;
+  declare leftPercent: number;
   declare done_at: string;
+  declare formated_done_at: string;
   declare order_id: number;
 
   /* istanbul ignore next */
@@ -49,6 +55,50 @@ Task.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    formated_due_at: {
+      type: DataTypes.VIRTUAL,
+      allowNull: true,
+      get(this: Task): string {
+        return moment(this.dataValues.due_at).format("DD/MM/YYYY");
+      },
+    },
+    done_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    formated_done_at: {
+      type: DataTypes.VIRTUAL,
+      allowNull: true,
+      get(this: Task): string | null {
+        if (!this.dataValues.done_at) return null;
+        return moment(this.dataValues.done_at).format("DD/MM/YYYY");
+      },
+    },
+    left: {
+      type: DataTypes.VIRTUAL,
+      allowNull: true,
+      get(this: Task): number {
+        const left = tools.diffDates(new Date(), this.dataValues.due_at);
+        return left < 0 && this.status == 1 ? 100 : left < 0 ? 0 : left;
+      },
+    },
+    leftPercent: {
+      type: DataTypes.VIRTUAL,
+      allowNull: true,
+      get(this: Task): number {
+        const leftPerc =
+          Math.round(
+            (this.left /
+              tools.diffDates(this.createdAt, this.dataValues.due_at)) *
+              10000
+          ) / 100;
+        return leftPerc < 0 && this.status == 1
+          ? 100
+          : leftPerc < 0
+          ? 0
+          : leftPerc;
+      },
+    },
     status: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -59,10 +109,7 @@ Task.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    done_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

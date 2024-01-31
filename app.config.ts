@@ -2,16 +2,15 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config();
-
+const env = process.env.NODE_ENV || "prod";
 let config: any = {
   app: {
-    port:
-      process.env.NODE_ENV != "test" ? process.env.PORT : process.env.PORT_TEST,
+    port: env != "test" ? process.env.PORT : process.env.PORT_TEST,
     name: process.env.APP_NAME || "Turn",
     url: process.env.APP_URL || "http://localhost",
     public: path.join(__dirname, "./public"),
     views: path.join(__dirname, "./views"),
-    env: process.env.NODE_ENV,
+    env,
     allowedUrl: process.env.ALLOWED_URL,
   },
 
@@ -42,7 +41,7 @@ let config: any = {
 
   auth: {
     secret: process.env.PRIVATE_KEY || "<PRIVATE_KEY>",
-    expiresIn: process.env.EXPIRES_IN || 3600,
+    expiresIn: Number(process.env.EXPIRES_IN) || 84600,
   },
 
   test: {

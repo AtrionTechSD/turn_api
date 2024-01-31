@@ -25,8 +25,7 @@ export class App {
 
     this.app.use(
       cors({
-        origin: config.app.allowedUrl,
-        credentials: true,
+        origin: "*",
       })
     );
   }
@@ -41,3 +40,5 @@ export class App {
     this.app.listen(this.port);
   }
 }
+
+

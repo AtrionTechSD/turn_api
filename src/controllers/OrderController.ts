@@ -31,10 +31,7 @@ export default class OrderController extends Controller implements IController {
   async changeStatus(req: any, res: any) {
     this.safeRun(async () => {
       const orderId = req.params.id;
-      const updated = await this.orderService.changeStatus(
-        orderId,
-        req.body.status
-      );
+      const updated = await this.orderService.changeStatus(orderId, req.body);
       response.success(res, 201, updated, "Status actualizado ");
     }, res);
   }

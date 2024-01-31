@@ -188,6 +188,15 @@ class Requests {
     ];
   }
 
+  public validateTaskBulkId(): Array<ValidationChain> {
+    return [
+      body("ids", "Debe proporcionar de 1 a 10 ids de tareas").isArray({
+        min: 1,
+        max: 10,
+      }),
+    ];
+  }
+
   public validateTaskStatus(): Array<ValidationChain> {
     return [
       body("status", "El estado de la tarea debe ser 0 ó 1").isIn([0, 1]),

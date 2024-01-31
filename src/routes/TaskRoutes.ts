@@ -28,6 +28,24 @@ export default class TaskRoutes extends AbstractRoutes<TaskController> {
           this.controller.getTasks(req, res);
         }
       );
+
+    this.router.patch(
+      "/complete",
+      Requests.validateTaskBulkId(),
+      Requests.validate,
+      (req: any, res: any) => {
+        this.controller.bulkComplete(req, res);
+      }
+    );
+
+    this.router.patch(
+      "/pendiente",
+      Requests.validateTaskBulkId(),
+      Requests.validate,
+      (req: any, res: any) => {
+        this.controller.bulkPendiente(req, res);
+      }
+    );
     this.router
       .route("/:id")
       .put(
@@ -36,14 +54,6 @@ export default class TaskRoutes extends AbstractRoutes<TaskController> {
         Requests.validate,
         (req: any, res: any) => {
           this.controller.updateTask(req, res);
-        }
-      )
-      .patch(
-        Requests.validateParamId(),
-        Requests.validateTaskStatus(),
-        Requests.validate,
-        (req: any, res: any) => {
-          this.controller.changeStatus(req, res);
         }
       )
       .delete(
