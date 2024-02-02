@@ -138,12 +138,11 @@ class Requests {
       body("title", "El campo título es requerido").notEmpty(),
       body("description", "El campo descripción es requerido").notEmpty(),
       body("due_at", "La fecha de entrega es requerida").notEmpty(),
-      body(
-        "due_at",
-        "La fecha de entrega debe ser posterior a la actual"
-      ).custom((value) => {
-        return moment(value).isAfter(moment.now());
-      }),
+      body("due_at", "La fecha de entrega debe ser actual o posterior").custom(
+        (value) => {
+          return moment(value).isAfter(moment().subtract(1, "day"));
+        }
+      ),
       body("status", "El campo estado es requerido").notEmpty(),
       body("status", "El estado no es válido").isIn(Object.values(OStatus)),
       body("type", "El campo tipo es requerido").notEmpty(),
@@ -175,9 +174,9 @@ class Requests {
       ).notEmpty(),
       body(
         "tasks.*.due_at",
-        "La entrega de cada tarea debe ser posterior a la actual"
+        "La entrega de cada tarea debe ser actual o posterior"
       ).custom((value) => {
-        return moment(value).isAfter(moment.now());
+        return moment(value).isAfter(moment().subtract(1, "day"));
       }),
     ];
   }
