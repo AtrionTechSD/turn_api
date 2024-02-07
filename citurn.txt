@@ -1,0 +1,7 @@
+
+Para la Api
+rsync -avz dist/ moso@75.102.23.121:/home/moso/turn/backend/dist
+
+
+Para el FrontEnd
+rsync -avz dist/ moso@75.102.23.121:/home/moso/turn/frontent/dist

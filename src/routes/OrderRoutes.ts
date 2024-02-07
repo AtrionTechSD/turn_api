@@ -24,6 +24,14 @@ export default class OrderRoutes extends AbstractRoutes<OrderController> {
       .get((req: any, res: any) => {
         this.controller.getOrders(req, res);
       });
+    this.router.delete(
+      "/documents/delete/:id",
+      Requests.validateParamId(),
+      Requests.validate,
+      (req: any, res: any) => {
+        this.controller.removeDocuments(req, res);
+      }
+    );
     this.router
       .route("/:id")
       .put(
@@ -53,6 +61,16 @@ export default class OrderRoutes extends AbstractRoutes<OrderController> {
       Requests.validate,
       (req: any, res: any) => {
         this.controller.setImages(req, res);
+      }
+    );
+
+    this.router.patch(
+      "/:id/documents",
+      Requests.validateParamId(),
+      Requests.validateDocumentArrayCreation(),
+      Requests.validate,
+      (req: any, res: any) => {
+        this.controller.addDocuments(req, res);
       }
     );
   }

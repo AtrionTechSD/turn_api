@@ -2,13 +2,12 @@ import { v2 as cloudinary } from "cloudinary";
 import config from "../../app.config";
 
 export default class AppService {
-  public async getCloudSignature(publicId: number | string): Promise<any> {
+  public async getCloudSignature(): Promise<any> {
     try {
       const timestamp = Math.round(new Date().getTime() / 1000);
       cloudinary.config(config.cloudinary);
       const params = {
         eager: "w_400,h_300,c_fill",
-        public_id: publicId,
         timestamp: timestamp,
         upload_preset: "oucbxfou",
       };

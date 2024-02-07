@@ -67,4 +67,23 @@ export default class OrderController extends Controller implements IController {
       response.success(res, 201, images, "Imágenes añadidas al pedido");
     }, res);
   }
+
+  async addDocuments(req: any, res: any) {
+    this.safeRun(async () => {
+      const orderId = req.params.id;
+      const documents = await this.orderService.addDocuments(
+        orderId,
+        req.body.documents
+      );
+      response.success(res, 201, documents, "Documentos añadidos al pedido");
+    }, res);
+  }
+
+  async removeDocuments(req: any, res: any) {
+    this.safeRun(async () => {
+      const documentId = req.params.id;
+      const document = await this.orderService.removeDocument(documentId);
+      response.success(res, 200, document, "Documento removido");
+    }, res);
+  }
 }

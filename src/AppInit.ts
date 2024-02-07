@@ -22,10 +22,9 @@ export class App {
     this.app.use(cookieParser());
     this.app.use("/api/public", express.static("public"));
     this.app.use("/api/views", express.static("views"));
-
     this.app.use(
       cors({
-        origin: "*",
+        origin: config.app.allowedUrl,
       })
     );
   }
@@ -37,8 +36,8 @@ export class App {
   }
 
   public listen() {
-    this.app.listen(this.port);
+    this.app.listen(this.port, () => {
+      console.log(`Corriendo App en ${this.port}`);
+    });
   }
 }
-
-

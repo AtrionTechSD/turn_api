@@ -11,7 +11,7 @@ let config: any = {
     public: path.join(__dirname, "./public"),
     views: path.join(__dirname, "./views"),
     env,
-    allowedUrl: process.env.ALLOWED_URL,
+    allowedUrl: env == "dev" ? process.env.ALLOWED_URL : "*",
   },
 
   db: {

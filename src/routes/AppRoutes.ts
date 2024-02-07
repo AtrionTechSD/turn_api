@@ -9,7 +9,7 @@ export default class AppRoutes extends AbstractRoutes<AppController> {
   }
 
   initRoutes(): void {
-    this.router.get(
+    this.router.post(
       "/cloudinary/signature",
       AuthMiddleware.auth,
       AuthMiddleware.isRole("admin"),

@@ -78,6 +78,8 @@ export interface IOrder {
   type: OType;
   client_id: number;
   tasks: Array<ITask>;
+  documents: Array<IDocument>;
+  images: Array<IImage>;
 }
 
 export interface ITask {
@@ -85,4 +87,13 @@ export interface ITask {
   due_at: string;
   order_id?: number;
   status?: 0 | 1;
+}
+
+export interface IDocument {
+  title: string;
+  description: string;
+  url: string;
+  type: string;
+  order_id: number;
+  order?: IOrder;
 }

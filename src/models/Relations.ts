@@ -1,5 +1,6 @@
 import Auth from "./Auth";
 import Career from "./Career";
+import Document from "./Document";
 import Image from "./Image";
 import Institute from "./Institute";
 import Order from "./Order";
@@ -103,6 +104,11 @@ export default class Relation {
     User.hasMany(Order, {
       as: "orders",
       foreignKey: "client_id",
+    });
+
+    Order.hasMany(Document, {
+      as: "documents",
+      foreignKey: "order_id",
     });
   }
 }

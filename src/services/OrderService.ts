@@ -1,13 +1,21 @@
 import { Connection } from "../db/Connection";
+import DocumentRepository from "../repositories/DocumentRepository";
 import ImageRepository from "../repositories/ImageRepository";
 import OrderRepository from "../repositories/OrderRepository";
 import TaskRepository from "../repositories/TaskRepository";
-import { IImage, IOrder, IParams, OStatus } from "../utils/Interfaces";
+import {
+  IDocument,
+  IImage,
+  IOrder,
+  IParams,
+  OStatus,
+} from "../utils/Interfaces";
 
 export default class OrderService {
   private orderRepo: OrderRepository = new OrderRepository();
   private taskRepo: TaskRepository = new TaskRepository();
   private imageRepo: ImageRepository = new ImageRepository();
+  private documentRepo: DocumentRepository = new DocumentRepository();
 
   async createOrder(order: IOrder): Promise<any> {
     const trans = await Connection.getConnectionInstance().getTrans();
@@ -130,6 +138,58 @@ export default class OrderService {
       await trans.rollback();
       throw {
         code: 500,
+        message: error.message,
+      };
+    }
+  }
+
+  public async addDocuments(
+    orderId: number,
+    documents: IDocument[]
+  ): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      const order: IOrder = await this.orderRepo.findById(orderId);
+      if (!order) {
+        throw {
+          code: 404,
+          message: "Pedido no encontrado",
+        };
+      }
+      const results = [];
+      documents = documents.map((document) => ({
+        title: document.title,
+        description: document.description,
+        order_id: orderId,
+        type: document.type,
+        url: document.url,
+      }));
+      for (let document of documents) {
+        const result = await this.documentRepo.create(document, trans);
+        results.push(result);
+      }
+      await trans.commit();
+      return results;
+    } catch (error: any) {
+      await trans.rollback();
+      throw {
+        code: error.code,
+        message: error.message,
+      };
+    }
+  }
+
+  public async removeDocument(documentId: number): Promise<any> {
+    const trans = await Connection.getConnectionInstance().getTrans();
+    try {
+      await this.documentRepo.delete(documentId, trans);
+      await trans.commit();
+      return true;
+    } catch (error: any) {
+      await trans.rollback();
+      console.log(error);
+      throw {
+        code: error.code,
         message: error.message,
       };
     }

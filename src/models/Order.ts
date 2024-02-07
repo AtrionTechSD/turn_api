@@ -54,6 +54,7 @@ class Order
       "tasks",
       "tasks.images",
       "images",
+      "documents",
     ];
   }
 }

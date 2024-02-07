@@ -76,6 +76,7 @@ CREATE TABLE `images` (
 `updatedAt` TIMESTAMP NOT NULL DEFAULT current_timestamp,
 `deletedAt` TIMESTAMP);
 
+
 CREATE TABLE `documents` (
 `id` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 `title` VARCHAR(75) NOT NULL,

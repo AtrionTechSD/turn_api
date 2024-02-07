@@ -115,12 +115,39 @@ class Requests {
 
   public validateImageArrayCreation(): Array<ValidationChain> {
     return [
+      body("images", "Debe incluir alguna imagen")
+        .exists()
+        .isArray({ min: 1, max: 5 }),
       body("images.*.url", "Se requiere la ruta de cada imagen").notEmpty(),
       body("images.*.url", "Algunas urls no son válidas").isURL(),
       body(
         "images.*.caption",
         "Se requiere el texto de cada imagen"
       ).notEmpty(),
+    ];
+  }
+
+  public validateDocumentArrayCreation(): Array<ValidationChain> {
+    return [
+      body("documents", "Debe incluir algún documento")
+        .exists()
+        .isArray({ min: 1, max: 5 }),
+      body(
+        "documents.*.url",
+        "Se requiere la ruta de cada documento"
+      ).notEmpty(),
+      body(
+        "documents.*.description",
+        "Se requiere la descripción de cada documento"
+      ).notEmpty(),
+      body(
+        "documents.*.title",
+        "Se requiere el título de cada documento"
+      ).notEmpty(),
+      body("documents.*.url", "Algunas urls no son válidas").isURL(),
+      body("documents.*.type", "Se requiere el tipo válido de cada documento")
+        .notEmpty()
+        .isIn(["Recurso", "Entrega"]),
     ];
   }
 
